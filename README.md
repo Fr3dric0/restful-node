@@ -1,5 +1,6 @@
 Express CRUD-API
 ================
+[![Known Vulnerabilities](https://snyk.io/test/github/fr3dric0/express-crud-api/badge.svg)](https://snyk.io/test/github/fr3dric0/express-crud-api)
 
 ## Table Of Contents
 
