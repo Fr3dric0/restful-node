@@ -1,9 +1,34 @@
-var express = require('express');
-var router = express.Router();
+const routeMapper = require('../helper/router');
+const HelloWorld = require('../controller/hello-world');
+const { NotFoundError } = require('../error/http-errors');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+/**
+ *
+ * @param   {Express}   app
+ * @param   {String}    prefix
+ * @return  {Express}   app
+ * */
+const urls = function(app, prefix = '/') {
 
-module.exports = router;
+    const helloWorld = new HelloWorld();
+
+    app.use(prefix, routeMapper(helloWorld));
+    // app.use(prefix, routeMapper(helloWorld, {
+    //     prefix: ':name/:age'
+    // }));
+
+
+
+    app.use(prefix, notFoundHandler); // 404 Handler
+    return app;
+};
+
+/**
+ * Handler for 404 responses
+ * @function    notFoundHandler
+ * */
+const notFoundHandler = (req, res, next) => {
+    return next(new NotFoundError(`Could not find page ${req.originalUrl}`));
+};
+
+module.exports = urls;

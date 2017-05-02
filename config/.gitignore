@@ -1,0 +1,6 @@
+
+##
+# Files prefixed with _ is automatically ignored
+##
+**/_*.json
+**/_*.js
