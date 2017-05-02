@@ -7,7 +7,7 @@ class HelloWorld extends Response {
         super();
         this.model = HelloWorldModel;
     }
-    
+
 }
 
 

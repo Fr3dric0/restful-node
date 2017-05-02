@@ -6,8 +6,11 @@ const bodyParser = require('body-parser');
 
 const databaseSetup = require('./config/db');
 
+
 const app = express();
 
+// Set logger to only print detailed
+// responses, if NODE_ENV is not in production
 let logger = null;
 if (app.get('env') === 'production') {
     logger = morgan('combined', {
@@ -26,20 +29,5 @@ const db = databaseSetup({ database: 'hello-world' });
 
 const paths = require('./routes');
 paths(app);
-
-// production error handler
-// no stacktraces leaked to user
-app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-
-    const response = {'error': err.message };
-
-    if (app.get('env') !== 'production') {
-        response.stack = err.stack;
-    }
-
-    res.json(response);
-});
-
 
 module.exports = app;

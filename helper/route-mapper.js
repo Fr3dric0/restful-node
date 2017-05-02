@@ -16,9 +16,9 @@ module.exports = function(controller, options = {}) {
 
     router.get(url, controller.list);
     router.post(url, controller.create);
-    router.get(`${url}/:id`, controller.retrieve);
-    router.patch(`${url}/:id`, controller.update);
-    router.delete(`${url}/:id`, controller.delete);
+    router.get(`${url}:id`, controller.retrieve);
+    router.patch(`${url}:id`, controller.update);
+    router.delete(`${url}:id`, controller.delete);
 
     return router;
 };

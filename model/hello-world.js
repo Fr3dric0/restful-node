@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { BadRequestError } = require('../error/http-errors');
+const { BadRequestError } = require('../error/http.error');
 
 const HelloWorld = new Schema({
     title: { type: String, required: true, unique: true },
@@ -16,9 +16,6 @@ HelloWorld.pre('save', (next) => {
 });
 
 HelloWorld.post('save', (err, doc, next) => {
-    console.log(err);
-    console.log(doc);
-
     if (err && err.name === 'ValidationError'
         && err.errors && err.errors.description) {
 

@@ -1,8 +1,16 @@
-const routeMapper = require('../helper/router');
+const { NotFoundError } = require('../error/http.error');
+const ErrorHandler = require('../error/error-handler');
+const routeMapper = require('../helper/route-mapper');
+
+// Add your own controllers
 const HelloWorld = require('../controller/hello-world');
-const { NotFoundError } = require('../error/http-errors');
 
 /**
+ * Attach your routes to the app variable.
+ * Example:
+ * ```
+ * app.use('/api/user', routeMapper(new UserController()));
+ * ```
  *
  * @param   {Express}   app
  * @param   {String}    prefix
@@ -10,21 +18,20 @@ const { NotFoundError } = require('../error/http-errors');
  * */
 const urls = function(app, prefix = '/') {
 
-    const helloWorld = new HelloWorld();
-
-    app.use(prefix, routeMapper(helloWorld));
-    // app.use(prefix, routeMapper(helloWorld, {
-    //     prefix: ':name/:age'
-    // }));
+    // Controllers
+    app.use(prefix, routeMapper(new HelloWorld()));
 
 
+    // Error Handlers
+    app.use(prefix, notFoundHandler); // 404 Handler, place last
+    app.use(new ErrorHandler(app).handle);
 
-    app.use(prefix, notFoundHandler); // 404 Handler
     return app;
 };
 
 /**
- * Handler for 404 responses
+ * Handler for 404 responses.
+ * Will instantiate a NotFoundError
  * @function    notFoundHandler
  * */
 const notFoundHandler = (req, res, next) => {

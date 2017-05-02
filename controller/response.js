@@ -43,7 +43,7 @@ class Response {
 
         const { id } = req.params;
 
-        let query = this._setFilters(this.model.findOne({id}), req);
+        let query = this._setFilters(this.model.findOne({_id: id}), req);
 
         query
             .then((data) => {
@@ -59,7 +59,7 @@ class Response {
 
         const { id } = req.params;
 
-        this.model.findOneAndUpdate({id}, {$set: req.body}, {new: true})
+        this.model.findOneAndUpdate({_id: id}, {$set: req.body}, {new: true})
             .then((data) => {
                 res.status(data ? 200 : 404).json(data);
             })
@@ -83,7 +83,7 @@ class Response {
 
         const { id } = req.params;
 
-        this.model.remove({id})
+        this.model.remove({_id: id})
             .then(result => res.status(204).json(result))
             .catch(err => next(err));
 
