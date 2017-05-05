@@ -1,6 +1,5 @@
 const { NotFoundError } = require('../error/http.error');
 const ErrorHandler = require('../error/error-handler');
-const routeMapper = require('../helper/route-mapper');
 
 // Add your own controllers
 const HelloWorld = require('../controller/hello-world');
@@ -19,8 +18,7 @@ const HelloWorld = require('../controller/hello-world');
 const urls = function(app, prefix = '/') {
 
     // Controllers
-    app.use(prefix, routeMapper(new HelloWorld()));
-
+    app.use(prefix, new HelloWorld().asView());
 
     // Error Handlers
     app.use(prefix, notFoundHandler); // 404 Handler, place last

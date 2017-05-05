@@ -1,18 +1,22 @@
+const express = require('express');
+
 /**
  *
  * @module  controller/response
  * */
 class Response {
 
-    constructor (prefix = null) {
+    constructor (prefix = '') {
         this.model = null;
         this.prefix = prefix;
+        this.usePatch = true; // Will use PATCH instead of PUT on update
 
         this.list = this.list.bind(this);
         this.retrieve = this.retrieve.bind(this);
         this.update = this.update.bind(this);
         this.create = this.create.bind(this);
         this.delete = this.delete.bind(this);
+        this.asView = this.asView.bind(this);
     }
 
     /**
@@ -27,7 +31,7 @@ class Response {
             return res.sendStatus(405);
         }
 
-        let query = this._setFilters(this.model.find(req.body), req);
+        let query = this._setPagination(this.model.find(req.body), req);
 
         query
             .then((data) => {
@@ -43,7 +47,7 @@ class Response {
 
         const { id } = req.params;
 
-        let query = this._setFilters(this.model.findOne({_id: id}), req);
+        let query = this._setPagination(this.model.findOne({_id: id}), req);
 
         query
             .then((data) => {
@@ -89,7 +93,36 @@ class Response {
 
     }
 
-    _setFilters (query, req) {
+    /**
+     * Converts controller methods to
+     * a router friendly object.
+     *
+     * @return  {Router}    express Router object
+     */
+    asView() {
+        const router = express.Router();
+        const url = `/${this.prefix ? this.prefix + '/' : ''}`;
+
+        router.post(url, this.create);
+        router.get(url, this.list);
+        router.get(`${url}:id`, this.retrieve);
+
+        if (this.usePatch) {
+            router.patch(`${url}:id`, this.update);
+        } else {
+            router.put(`${url}:id`, this.update);
+        }
+
+        router.delete(`${url}:id`, this.delete);
+
+        return router;
+    }
+
+    /**
+     *
+     *
+     * */
+    _setPagination (query, req) {
         let limit = req.query.limit || -1;
 
         if (req.query.offset) {
