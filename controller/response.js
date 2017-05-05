@@ -10,13 +10,47 @@ class Response {
         this.model = null;
         this.prefix = prefix;
         this.usePatch = true; // Will use PATCH instead of PUT on update
+        this.fields = [];
 
         this.list = this.list.bind(this);
         this.retrieve = this.retrieve.bind(this);
         this.update = this.update.bind(this);
         this.create = this.create.bind(this);
-        this.delete = this.delete.bind(this);
+        this.destroy = this.destroy.bind(this);
+
+        this.listWrapper = this.listWrapper.bind(this);
+        this.retrieveWrapper = this.retrieveWrapper.bind(this);
+        this.createWrapper = this.createWrapper.bind(this);
+        this.updateWrapper = this.updateWrapper.bind(this);
+        this.destroyWrapper = this.destroyWrapper.bind(this);
+
         this.asView = this.asView.bind(this);
+    }
+
+
+    listWrapper(req, res, next) {
+
+      return this.list(req, res, next);
+    }
+
+    retrieveWrapper(req, res, next) {
+
+        return this.retrieve(req, res, next);
+    }
+
+    createWrapper(req, res, next) {
+
+        return this.create(req, res, next);
+    }
+
+    updateWrapper(req, res, next) {
+
+        return this.update(req, res, next);
+    }
+
+    destroyWrapper(req, res, next) {
+
+        return this.destroy(req, res, next);
     }
 
     /**
@@ -80,7 +114,7 @@ class Response {
             .catch(err => next(err));
     }
 
-    delete (req, res, next) {
+    destroy (req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
@@ -103,19 +137,32 @@ class Response {
         const router = express.Router();
         const url = `/${this.prefix ? this.prefix + '/' : ''}`;
 
-        router.post(url, this.create);
-        router.get(url, this.list);
-        router.get(`${url}:id`, this.retrieve);
+        router.post(url, this.createWrapper);
+        router.get(url, this.listWrapper);
+        router.get(`${url}:id`, this.retrieveWrapper);
 
         if (this.usePatch) {
-            router.patch(`${url}:id`, this.update);
+            router.patch(`${url}:id`, this.updateWrapper);
         } else {
-            router.put(`${url}:id`, this.update);
+            router.put(`${url}:id`, this.updateWrapper);
         }
 
-        router.delete(`${url}:id`, this.delete);
+        router.delete(`${url}:id`, this.destroyWrapper);
 
         return router;
+    }
+
+    /**
+     * Will assure only the elements specified
+     * in the `fields`-array is displayed for the user.
+     *
+     * */
+    _export(data) {
+        if (typeof data === '[object Array]') {
+            return data.map((item) => {
+
+            });
+        }
     }
 
     /**
