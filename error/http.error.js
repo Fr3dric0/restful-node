@@ -15,7 +15,7 @@ class HttpError extends Error {
  * */
 class NotFoundError extends HttpError {
 
-    constructor (message) {
+    constructor (message = null) {
         super(message);
         this.status = 404;
     }
