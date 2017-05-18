@@ -71,6 +71,7 @@ export default class AuthController extends Controller {
 
     private _mapFilters (req, res): any {
         return this.authFilters
-            .map((f) => f.canAccess(req, res));
+            .map((f) => f.canAccess ? f.canAccess(req, res) : null)
+            .filter(f => f != null);
     }
 }
