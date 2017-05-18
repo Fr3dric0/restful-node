@@ -2,6 +2,9 @@
   "name": "express-crud-api",
   "version": "1.0.0",
   "private": true,
+  "main": "dist/index",
+  "lib": "dist/index",
+
   "scripts": {
     "start": "node ./bin/www",
     "build": "gulp default",
@@ -13,11 +16,11 @@
     "debug": "~2.2.0",
     "express": "~4.15.2",
     "mongoose": "^4.9.7",
-    "morgan": "~1.7.0"
+    "morgan": "~1.7.0",
+    "express-crud-api": "git://github.com/Fr3dric0/express-crud-api.git"
   },
   "devDependencies": {
     "@types/node": "^7.0.18",
-    "awesome-typescript-loader": "^3.1.3",
     "gulp": "^3.9.1",
     "gulp-typescript": "^3.1.6",
     "ts-loader": "^2.0.3",

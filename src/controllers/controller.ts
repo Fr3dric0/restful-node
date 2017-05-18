@@ -1,22 +1,19 @@
-const express = require('express');
-const { NotFoundError } = require('../error/http.error');
+import express from 'express';
+import { NotFoundError } from '../errors';
 
 /**
  *
  * @module  controller/response
  * */
-export class Controller {
+export default class Controller {
     private model: any = null;
     protected prefix: string;
-    protected usePatch: boolean = true;
+    protected usePatch: boolean = true; // Will use PATCH instead of PUT on update
     protected fields: string[] = [];
 
 
     constructor (prefix = '') {
-        this.model = null;
         this.prefix = prefix;
-        this.usePatch = true; // Will use PATCH instead of PUT on update
-        this.fields = [];
 
         this.list = this.list.bind(this);
         this.retrieve = this.retrieve.bind(this);

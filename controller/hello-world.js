@@ -1,9 +1,8 @@
-const AuthResponse = require('./auth-response');
+const { AuthController } = require('../dist').controllers;
 const HelloWorldModel = require('../model/hello-world');
-const { BadRequestError } = require('../error/http.error');
-const func = require('../dist/');
+const { BadRequestError } = require('../dist/error/http.error');
 
-class HelloWorld extends AuthResponse {
+class HelloWorld extends AuthController {
   
   constructor () {
     super();
@@ -11,15 +10,13 @@ class HelloWorld extends AuthResponse {
     this.authFilters.push(requireNothing);
   }
   
-  list(req, res, next) {
-    console.log(func.name());
-    
+  list (req, res, next) {
     res.sendStatus(200);
   }
   
 }
 
-function requireNothing(req) {
+function requireNothing (req) {
   throw new BadRequestError('Bad values');
 }
 

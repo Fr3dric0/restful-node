@@ -1,24 +1,37 @@
-const { NotFoundError } = require('../error/http.error');
-const ErrorHandler = require('../error/error-handler');
+import { NotFoundError } from '../errors/http.error';
+import { Route } from './route';
+import { ErrorHandler } from '../errors/error-handler';
 
-// Add your own controllers
-import { HelloWorld } from '../controllers/hello-world';
 
 /**
- * Attach your routes to the app variable.
+ * Routes is added to the views array,
+ * with the following format
  * Example:
  * ```
- * app.use('/api/user', routeMapper(new UserController()));
+ * [
+ *  { controller: new IndexController() },
+ *  { url: '/home', controller: new HomeController() }
+ * ]
  * ```
  *
- * @param   {Express}   app
- * @param   {String}    prefix
+ * @param   {Express}   app     The express-app
+ * @param   {String}    prefix  Url prefix
+ * @param   {Route[]}   views   list of views
  * @return  {Express}   app
  * */
-export function urls(app, prefix = '/', views: any[]) {
+export function urls(app, prefix: string, views: Route[]) {
 
-    // Controllers
-    app.use(prefix, new HelloWorld().asView());
+    for (const view of views) {
+        if (!view.controller) {
+            continue;
+        }
+
+        if (view.url && !view.url.startsWith('/')) {
+            throw new TypeError(`Url '${view.url}' must be prefixed with /`);
+        }
+
+        app.use(`${prefix}${view.url || ''}`, view.controller.asView());
+    }
 
     // Error Handlers
     app.use(prefix, notFoundHandler); // 404 Handler, place last
@@ -26,10 +39,6 @@ export function urls(app, prefix = '/', views: any[]) {
 
     return app;
 }
-
-urls(app, '/', [
-
-]);
 
 /**
  * Handler for 404 responses.
@@ -40,4 +49,3 @@ export function notFoundHandler (req, res, next) {
     return next(new NotFoundError(`Could not find page ${req.originalUrl}`));
 }
 
-//module.exports = urls;

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { BadRequestError } = require('../error/http.error');
+const { BadRequestError } = require('../dist/error/http.error');
 
 const HelloWorld = new Schema({
     title: { type: String, required: true, unique: true },
