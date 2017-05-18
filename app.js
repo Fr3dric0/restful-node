@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const databaseSetup = require('./config/db');
+const { setupMongoose } = require('./dist').database;
 
 const app = express();
 
@@ -26,8 +26,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-const db = databaseSetup({ database: 'hello-world' });
+///////////////////////////
+//  DATABASE CONNECTION  //
+// Provide configuration //
+// as parameter          //
+///////////////////////////
+const db = setupMongoose({ database: 'hello-world' });
 
+///////////////////////////
+//  ROUTE REGISTRATION   //
+// Also handles errors   //
+///////////////////////////
 const HelloWorld = require('./controller/hello-world');
 
 const { urls } = require('./dist').routes;

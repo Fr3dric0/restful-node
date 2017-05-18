@@ -8,6 +8,10 @@
     "dist/",
     "tsconfig.json"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Fr3dric0/express-crud-api.git"
+  },
   "scripts": {
     "start": "node ./bin/www",
     "build": "gulp default",
