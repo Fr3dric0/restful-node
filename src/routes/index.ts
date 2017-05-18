@@ -1,7 +1,5 @@
-import { NotFoundError } from '../errors/http.error';
+import { NotFoundError, ErrorHandler } from '../errors';
 import { Route } from './route';
-import { ErrorHandler } from '../errors/error-handler';
-
 
 /**
  * Routes is added to the views array,

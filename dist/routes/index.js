@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const http_error_1 = require("../errors/http.error");
-const error_handler_1 = require("../errors/error-handler");
+const errors_1 = require("../errors");
 /**
  * Routes is added to the views array,
  * with the following format
@@ -30,7 +29,7 @@ function urls(app, prefix, views) {
     }
     // Error Handlers
     app.use(prefix, notFoundHandler); // 404 Handler, place last
-    app.use(new error_handler_1.ErrorHandler(app).handle);
+    app.use(new errors_1.ErrorHandler(app).handle);
     return app;
 }
 exports.urls = urls;
@@ -40,6 +39,6 @@ exports.urls = urls;
  * @function    notFoundHandler
  * */
 function notFoundHandler(req, res, next) {
-    return next(new http_error_1.NotFoundError(`Could not find page ${req.originalUrl}`));
+    return next(new errors_1.NotFoundError(`Could not find page ${req.originalUrl}`));
 }
 exports.notFoundHandler = notFoundHandler;

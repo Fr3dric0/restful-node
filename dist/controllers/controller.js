@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
+const express = require("express");
 const errors_1 = require("../errors");
 /**
  *
@@ -138,7 +138,7 @@ class Controller {
      * @return  {Router}    express Router object
      */
     asView() {
-        const router = express_1.default.Router();
+        const router = express.Router();
         const url = `/${this.prefix ? this.prefix + '/' : ''}`;
         router.post(url, this.createWrapper);
         router.get(url, this.listWrapper);
