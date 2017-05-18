@@ -7,7 +7,9 @@ import {
     NotFoundError,
     BadRequestError,
     ErrorHandler,
-    DuplicationError
+    DuplicationError,
+    ForbiddenError,
+    UnauthorizedError
 } from './errors';
 
 import Filter from './auth/filter';
@@ -64,7 +66,9 @@ module.exports = {
         HttpError,
         NotFoundError,
         BadRequestError,
-        DuplicationError
+        DuplicationError,
+        ForbiddenError,
+        UnauthorizedError
     },
     auth: {
         Filter,

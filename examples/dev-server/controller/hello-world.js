@@ -1,19 +1,20 @@
-const { AuthController } = require('../../../dist').controllers;
+const { AuthController, JWTAuthController } = require('restful-node').controllers;
 const HelloWorldModel = require('../model/hello-world');
-const { BadRequestError } = require('../../../dist').errors;
+const { BadRequestError } = require('restful-node').errors;
+const { JWT } = require('restful-node').auth;
 
-class HelloWorld extends AuthController {
+class HelloWorld extends JWTAuthController {
   
   constructor () {
-    super();
+    super('', {secret: 'horselord'});
     this.model = HelloWorldModel;
-    this.authFilters.push(requireNothing);
+    this.ignoreMethods.push('create');
   }
   
-}
-
-function requireNothing (req) {
-  throw new BadRequestError('Bad values');
+  create(req, res, next) {
+    res.json({token: new JWT(this.secret, 9099999999).create({name: 'Jon Snow'})});
+  }
+  
 }
 
 module.exports = HelloWorld;

@@ -4,13 +4,13 @@ export default class JWT {
     private secret: string;
     private ttl: number;
 
-    constructor(secret: string, ttl: number) {
+    constructor(secret: string, ttl: number = null) {
         this.secret = secret;
         this.ttl = ttl;
     }
 
     create(sub: any): string {
-        return jwt.sign({data: sub}, this.secret, {expiresIn: this.ttl});
+        return jwt.sign({data: sub}, this.secret, this.ttl ? {expiresIn: this.ttl} : {});
     }
 
     verify(token: string): Promise<any> {

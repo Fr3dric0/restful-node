@@ -31,9 +31,16 @@ export class BadRequestError extends HttpError {
     }
 }
 
+export class ForbiddenError extends HttpError {
+    constructor(message) {
+        super(message);
+        this.status = 403;
+    }
+}
 
-// module.exports = {
-//     HttpError,
-//     NotFoundError,
-//     BadRequestError
-// };
+export class UnauthorizedError extends HttpError {
+    constructor(message) {
+        super(message);
+        this.status = 401;
+    }
+}
