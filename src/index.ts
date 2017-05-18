@@ -10,6 +10,11 @@ import {
     DuplicationError
 } from './errors';
 
+import Filter from './auth/filter';
+import JWTFilter from './auth/jwt.filter';
+import JWT from './auth/jwt';
+import JWTAuthController from './controllers/jwt-auth.controller';
+
 
 // Pollyfills
 declare global {
@@ -51,7 +56,7 @@ if (!Array.prototype.includes) {
 }
 
 module.exports = {
-    controllers: { Controller, AuthController },
+    controllers: { Controller, AuthController, JWTAuthController },
     routes: { urls, notFoundHandler },
     database: { setupMongoose },
     errors: {
@@ -60,5 +65,10 @@ module.exports = {
         NotFoundError,
         BadRequestError,
         DuplicationError
+    },
+    auth: {
+        Filter,
+        JWT,
+        JWTFilter
     }
 };

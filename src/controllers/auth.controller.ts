@@ -1,20 +1,17 @@
 import Controller from './controller';
+import Filter from '../auth/filter';
 
 export default class AuthController extends Controller {
-    protected authFilters = [];
+    protected authFilters: Filter[] = [];
     protected ignoreMethods: string[] = [];
 
     constructor (prefix = '') {
         super(prefix);
-
-        this.authFilters = [];
-        this.ignoreMethods = [];
-
         this._runFilters = this._runFilters.bind(this);
     }
 
     listWrapper(req, res, next) {
-        if (!this.ignoreMethods.includes('list')) {
+        if (this.ignoreMethods.includes('list')) {
             return super.listWrapper(req, res, next);
         }
 
@@ -24,7 +21,7 @@ export default class AuthController extends Controller {
     }
 
     retrieveWrapper(req, res, next) {
-        if (!this.ignoreMethods.includes('retrieve')) {
+        if (this.ignoreMethods.includes('retrieve')) {
             return super.retrieveWrapper(req, res, next);
         }
 
@@ -34,7 +31,7 @@ export default class AuthController extends Controller {
     }
 
     createWrapper (req, res, next) {
-        if (!this.ignoreMethods.includes('create')) {
+        if (this.ignoreMethods.includes('create')) {
             return super.createWrapper(req, res, next);
         }
 
@@ -44,7 +41,7 @@ export default class AuthController extends Controller {
     }
 
     updateWrapper (req, res, next) {
-        if (!this.ignoreMethods.includes('update')) {
+        if (this.ignoreMethods.includes('update')) {
             return super.updateWrapper(req, res, next);
         }
 
@@ -54,7 +51,7 @@ export default class AuthController extends Controller {
     }
 
     destroyWrapper (req, res, next) {
-        if (!this.ignoreMethods.includes('destroy')) {
+        if (this.ignoreMethods.includes('destroy')) {
             return super.destroyWrapper(req, res, next);
         }
 
@@ -63,13 +60,17 @@ export default class AuthController extends Controller {
             .catch(err => next(err));
     }
 
-    _runFilters(req = null) {
+    private _runFilters(req = null): Promise<any> {
         return new Promise((rsv, rr) => {
             Promise
-                .all(this.authFilters)
+                .all(this._mapFilters())
                 .then((results) => rsv())
                 .catch( err => rr(err));
         });
     }
 
+    private _mapFilters (): any {
+        return this.authFilters
+            .map((f) => f.canAccess);
+    }
 }

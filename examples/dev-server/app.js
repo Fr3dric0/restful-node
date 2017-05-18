@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const eca = require('../../dist');
+const eca = require('restful-node');
 const { setupMongoose } = eca.database;
 
 const app = express();
