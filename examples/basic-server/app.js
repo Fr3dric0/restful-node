@@ -4,7 +4,8 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const { setupMongoose } = require('./dist').database;
+const eca = require('express-crud-api');
+const { setupMongoose } = eca.database;
 
 const app = express();
 
@@ -39,7 +40,7 @@ const db = setupMongoose({ database: 'hello-world' });
 ///////////////////////////
 const HelloWorld = require('./controller/hello-world');
 
-const { urls } = require('./dist').routes;
+const { urls } = require('express-crud-api').routes;
 urls(app, '/api', [
   { controller: new HelloWorld() }
 ]);

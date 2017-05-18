@@ -2,91 +2,119 @@ Express CRUD-API
 ================
 [![Known Vulnerabilities](https://snyk.io/test/github/fr3dric0/express-crud-api/badge.svg)](https://snyk.io/test/github/fr3dric0/express-crud-api)
 
+**Quick install**
+`npm install --save express-crud-module`
+
 ## Table Of Contents
 
-1. [Installation](#installation)
-2. [Adding Controllers](#adding-controllers)
-3. [Creating Models](#creating-models)
+1. [General Description](#general-description)
+2. [Installation](#installation)
+3. [Adding Controllers](#adding-controllers)
+4. [Creating Models](#creating-models)
 
-The _Express CRUD-API_ is a skeleton REST-API in express with _mongodb_ as model.
-Out of the box the skeleton supports the operations.
+## General Description
+The _Express CRUD-API_ is a module built on top of _ExpressJS_,
+with _mongodb_ as an ORM. It's built in Typescript,
+but is compiled down to `ES2015`.
 
-- Create `POST /`
-- list `GET /`
-- Retrieve `GET /:id`
-- Update `PATCH /:id` (will add support to use PUT)
-- Delete `DELETE /:id`
+> For a basic skeleton, checkout example _basic-server_
 
-Checkout the `Response`-class in `controller/response.js`
-and the `HelloWorld`-controller for more details and examples.
+Express CRUD-API focuses heavily on _classes_ and _inheritance_
+to provide the features we expect.
 
-The primary thought for this skeleton and it's structure,
-is to have a generalized _REST-API_ where one would only
-have to provide a _pointer_ to the data-model.
-The parent controller would do the rest.
+A controller is therefore a `class`,
+with the following methods and linked http-requests and routes:
 
-With this base, we can add features and security
-just by extending the `Response`-controller, or adding `pre-` and `post-save` functions
-to the model.
+- `list` = `GET /`
+- `retrieve` = `GET /:id`
+- `create` = `POST /`
+- `update` = `PUT /:id` or `PATCH /:id`
+- `destroy` = `DELETE /:id`
 
+Note, each request-url can be prefixed with a string (or/and url-parameter).
+This can be done when calling `urls(...)`.
 
 ## Installation
 
 ### Minimum requirements
 
-- NodeJS v.7.4.0 (_Might support down to v.6.9.0. Must support ES2015 syntax_)
-- MongoDB (primary database client, planning to add support for Sequelize)
+- NodeJS v6.9.0 (_Built with v7.4.0. Must support ES2015 syntax_)
+- MongoDB (primary database client, planning to add support for Sequelize in the future)
 
 ### NodeJS
-Ensure you have installed NodeJS >= v.7.4.0.
+Ensure you have installed NodeJS >= v.6.9.0.
 This can be done with `apt-get install nodejs` in Ubuntu,
 `brew install nodejs` for Mac OS,
 checkout [nodejs.org](https://nodejs.org/en/) for more information.
 
 ### MongoDB
 Checkout their website for installation.
-When installed you should be able to call `mongod` to run the server,
-and `mongo` to run the client.
+When installed you should be able to call `mongod` to run the database-server,
+and `mongo` to run a simple client.
 
-### Fork or Clone Repository
-To get the _Express CRUD-API_ fork or clone the repository,
-through `git clone https://github.com/Fr3dric0/express-crud-api.git`.
+### Add to package.json
+Add `express-crud-module` to `package.json`.
 
-Remember to run `npm install`.
+```shell
+$ npm install --save express-crud-module
+```
 
-### Rename application
-To rename the application, visit the _config-file_ `config/config.js`,
-and replace the existing value in `name` with something fitting.
+Express CRUD-module will automatically add `express` and `mongoose`, ...
+to your modules (read _package.json_, for all the included modules).
 
-When all is set, you should be able to run your server.
-I personally recommend to use `nodemon` in development and `forever` in production.
+### Folder structure
+The module requires _no_ strict folder structure.
+My personal starting-point is to use `express-generator`,
+and remove the files I don't need (_which is most of them_).
+
+When completed, my structure usually looks like this:
+
+```
+project-name
+| bin
+| | www
+|
+| config
+| | _config.js (secret configuration, untracked)
+| | config.js (public configuration)
+|
+| controllers
+| | name1.controller.js
+| | name2.controller.js
+| | ...
+|
+| model
+| | model1.js
+| | ...
+|
+| library (if necessary)
+| | ...
+|
+| app.js
+| package.json
+| README.md
+```
 
 ## Adding Controllers
+Creating your own controllers i generally simple,
+and it does allot with generally little.
+If you only want basic CRUD operations,
+it should suffice to only register a _model_ to the controller.
 
-> N.B. - Do NOT rewrite the `Response`-class. This is our base-controller
+```js
+this.model = YourMongooseModel // Add in constructor
+```
 
-## Extending the Response controller
-
-After installation you probably want to add
-your own controller and serve custom data. To do this,
-simply create a new file, with a fitting name, in the `controller`-folder.
-Here you'll want to declare a new class
-(preferably matching the filename just in _PascalCase_),
-and _extend_ the `Response`-controller
-
-> Notice I'm using the words "controller" and "class" interchangeability,
-> when referring to the `Response`-class in `controller/response.js`.
-> This is because I want to make it clear the controller is a class,
-> and not a function.
-
-If the only thing you want to do is to implement simple CRUD operations,
-you only have to point to your _model_,
-in the constructor method `this.model = MyModel`.
+### Extending `Controller`
+In the folder of your choosing create a controller-file (`example1.controller.js`).
+Declare a class,
+and make it extend `Controller` (`require("express-crud-module").controllers.Controller`),
+or `AuthController`.
 
 > If no model is provided, and you haven't overridden the methods.
 > the controller will respond with `HTTP 405 Method Not Allowed`
 
-Otherwise, you can choose to override the _generic-methods_
+Methods to override is:
 
 - `list (req, res, next)`
 - `retrieve (req, res, next)`
@@ -94,37 +122,32 @@ Otherwise, you can choose to override the _generic-methods_
 - `update (req, res, next)`
 - `delete (req, res, next)`
 
-## Registering the controller to the urls
-When your controller is complete you'll need to register
-it with some routes. The quickest and easiest way to do this,
-is with the help of the `routeMapper`-helper (`helper/route-mapper.js`).
-
-In `routes/index.js`, attach your route to the `app` parameter.
+### Registering a controller to the urls
+When a controller is created you can register it to a route
+by calling `urls(...)`
 
 **Example**
-
 ```js
-// Without options
-app.use(prefix + '/user', routeMapper(new MyController());
+// app.js
 
-// With options
-app.use(prefix + '/user', routeMapper(new MyController(), {
-    prefix: ':name/:age'
-});
+const HelloWorld = require('./controller/hello-world');
+
+const { urls } = require('express-crud-api').routes;
+
+urls(app, '/api', [
+  { url: '/user', controller: new ExampleController() },
+  { controller: new HelloWorld() } // Controller uses default prefix
+]);
 ```
-
-As demonstrated in the example, you can add more prefixes to the url,
-and even include more _request-parameters_ by adding the `prefix` option
-to the `routeMapper`-function.
 
 ## Creating models
 I will not go into detail on how to create models,
-because it is already well documented by the `mongoose` team,
+because it is already well documented by `mongoose`,
 who created this schema.
 
 The `HelloWorld`-model (`model/hello-world.js`),
 should give enough information to create your own.
 
-Checkout out the `Response`-controller for how to interact with the model.
+Checkout out the examples for how to interact with the model.
 
 

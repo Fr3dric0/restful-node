@@ -11,7 +11,6 @@ export default class Controller {
     protected usePatch: boolean = true; // Will use PATCH instead of PUT on update
     protected fields: string[] = [];
 
-
     constructor (prefix = '') {
         this.prefix = prefix;
 
