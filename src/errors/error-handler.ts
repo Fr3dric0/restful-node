@@ -1,8 +1,12 @@
 /**
+ * Is responsible for parsing,
+ * handling and responding error messages.
  *
- * @module
+ * This object is automatically
+ * appended as the last route in `routes/index.js#urls`
+ * @module ErrorHandler
  * */
-export class ErrorHandler {
+export default class ErrorHandler {
     protected app;
 
     constructor(app) {
@@ -13,22 +17,21 @@ export class ErrorHandler {
     }
 
     handle(err, req, res, next) {
-        res.status(err.status || 500);
 
         const response: {error?: string, stack?: any } = {};
 
-        // Only append `error`
+        // Only appends `error`
         // field if a message exists
         if (err.message && err.message.length > 0) {
             response.error = err.message;
         }
 
+        // Ensures stack-trace is excluded when in production
         if (this.app.get('env') !== 'production') {
             response.stack = err.stack;
         }
 
-        res.json(response);
+        res.status(err.status || 500)
+            .json(response);
     }
 }
-
-module.exports = ErrorHandler;

@@ -1,6 +1,6 @@
 const { AuthController } = require('../dist').controllers;
 const HelloWorldModel = require('../model/hello-world');
-const { BadRequestError } = require('../dist/error/http.error');
+const { BadRequestError } = require('../dist');
 
 class HelloWorld extends AuthController {
   

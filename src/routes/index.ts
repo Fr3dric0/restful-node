@@ -1,4 +1,4 @@
-import { NotFoundError, ErrorHandler } from '../errors';
+import { NotFoundError, ErrorHandler } from '../errors/index';
 import { Route } from './route';
 
 /**

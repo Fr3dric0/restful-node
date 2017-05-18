@@ -30,7 +30,7 @@ const db = databaseSetup({ database: 'hello-world' });
 
 const HelloWorld = require('./controller/hello-world');
 
-const { urls } = require('express-crud-api').routes;
+const { urls } = require('./dist').routes;
 urls(app, '/api', [
   { controller: new HelloWorld() }
 ]);
