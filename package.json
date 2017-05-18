@@ -1,5 +1,5 @@
 {
-  "name": "express-crud-module",
+  "name": "RESTful-node",
   "version": "1.0.0",
   "private": false,
   "main": "dist/index",
@@ -10,7 +10,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Fr3dric0/express-crud-api.git"
+    "url": "https://github.com/Fr3dric0/restful-node.git"
   },
   "scripts": {
     "start": "node ./bin/www",
