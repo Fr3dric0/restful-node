@@ -1,5 +1,5 @@
 {
-  "name": "express-crud-api",
+  "name": "basic-server",
   "version": "1.0.0",
   "private": false,
   "scripts": {
@@ -8,6 +8,6 @@
   "dependencies": {
     "cookie-parser": "~1.4.3",
     "morgan": "~1.7.0",
-    "express-crud-api": "git://github.com/Fr3dric0/express-crud-api.git"
+    "restful-node": "^1.0.0"
   }
 }

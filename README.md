@@ -1,11 +1,16 @@
-Express CRUD-API
-================
+RESTful-node
+============
 [![Known Vulnerabilities](https://snyk.io/test/github/fr3dric0/express-crud-api/badge.svg)](https://snyk.io/test/github/fr3dric0/express-crud-api)
 
-**Quick install**
-`npm install --save express-crud-module`
+RESTful-node is a dependency built to simplify
+creation of CRUD based REST-APIs.
+The dependency mimics the MVC-pattern,
+with _controllers_, _models_ and optionally _views_.
 
-## Table Of Contents
+**Install**
+`npm install --save restful-node`
+
+## Table of Contents
 
 1. [General Description](#general-description)
 2. [Installation](#installation)
@@ -13,17 +18,17 @@ Express CRUD-API
 4. [Creating Models](#creating-models)
 
 ## General Description
-The _Express CRUD-API_ is a module built on top of _ExpressJS_,
+The _RESTful-node_ is a module built on top of _ExpressJS_,
 with _mongodb_ as an ORM. It's built in Typescript,
 but is compiled down to `ES2015`.
 
 > For a basic skeleton, checkout example _basic-server_
 
-Express CRUD-API focuses heavily on _classes_ and _inheritance_
-to provide the features we expect.
+RESTful-node focuses heavily on _classes_ and _inheritance_
+to provide the base features.
 
 A controller is therefore a `class`,
-with the following methods and linked http-requests and routes:
+with the following methods linked to http-methods and routes:
 
 - `list` = `GET /`
 - `retrieve` = `GET /:id`
@@ -53,14 +58,14 @@ When installed you should be able to call `mongod` to run the database-server,
 and `mongo` to run a simple client.
 
 ### Add to package.json
-Add `express-crud-module` to `package.json`.
+Add `restful-node` to `package.json`.
 
 ```shell
-$ npm install --save express-crud-module
+$ npm install --save restful-node
 ```
 
-Express CRUD-module will automatically add `express` and `mongoose`, ...
-to your modules (read _package.json_, for all the included modules).
+The module will automatically add `express` and `mongoose`, ...
+to your dependencies (read _package.json_, for all the included modules).
 
 ### Folder structure
 The module requires _no_ strict folder structure.
@@ -108,7 +113,7 @@ this.model = YourMongooseModel // Add in constructor
 ### Extending `Controller`
 In the folder of your choosing create a controller-file (`example1.controller.js`).
 Declare a class,
-and make it extend `Controller` (`require("express-crud-module").controllers.Controller`),
+and make it extend `Controller` (`require("restful-node").controllers.Controller`),
 or `AuthController`.
 
 > If no model is provided, and you haven't overridden the methods.
@@ -151,7 +156,7 @@ who created this schema.
 The `HelloWorld`-model in examples,
 should give enough information to create your own.
 
-To setup a connection use, `setupMongoose` in `require("express-crud-module").database`
+To setup a connection use, `setupMongoose` in `require("restful-node").database`
 
 Checkout out the examples for how to interact with the model.
 

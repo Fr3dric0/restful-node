@@ -4,8 +4,8 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const eca = require('express-crud-api');
-const { setupMongoose } = eca.database;
+const restful = require('restful-node');
+const { setupMongoose } = restful.database;
 
 const app = express();
 
@@ -40,7 +40,7 @@ const db = setupMongoose({ database: 'hello-world' });
 ///////////////////////////
 const HelloWorld = require('./controller/hello-world');
 
-const { urls } = require('express-crud-api').routes;
+const { urls } = restful.routes;
 urls(app, '/api', [
   { controller: new HelloWorld() }
 ]);

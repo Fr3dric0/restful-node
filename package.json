@@ -1,5 +1,5 @@
 {
-  "name": "RESTful-node",
+  "name": "restful-node",
   "version": "1.0.0",
   "private": false,
   "main": "dist/index",
@@ -8,6 +8,7 @@
     "dist/",
     "tsconfig.json"
   ],
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Fr3dric0/restful-node.git"
@@ -20,7 +21,7 @@
   "dependencies": {
     "body-parser": "~1.17.1",
     "debug": "~2.2.0",
-    "express": "~4.15.2",
+    "express": "^4.15.3",
     "mongoose": "^4.9.7"
   },
   "devDependencies": {

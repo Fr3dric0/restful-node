@@ -31,7 +31,6 @@ export default class Controller {
 
     listWrapper (req, res, next) {
         req = this._attachDb(req);
-
         return this.list(req, res, next);
     }
 
