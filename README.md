@@ -122,6 +122,9 @@ Methods to override is:
 - `update (req, res, next)`
 - `delete (req, res, next)`
 
+
+
+
 ### Registering a controller to the urls
 When a controller is created you can register it to a route
 by calling `urls(...)`
@@ -145,8 +148,10 @@ I will not go into detail on how to create models,
 because it is already well documented by `mongoose`,
 who created this schema.
 
-The `HelloWorld`-model (`model/hello-world.js`),
+The `HelloWorld`-model in examples,
 should give enough information to create your own.
+
+To setup a connection use, `setupMongoose` in `require("express-crud-module").database`
 
 Checkout out the examples for how to interact with the model.
 
