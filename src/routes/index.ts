@@ -2,7 +2,7 @@ const { NotFoundError } = require('../error/http.error');
 const ErrorHandler = require('../error/error-handler');
 
 // Add your own controllers
-const HelloWorld = require('../controller/hello-world');
+import { HelloWorld } from '../controllers/hello-world';
 
 /**
  * Attach your routes to the app variable.
@@ -15,7 +15,7 @@ const HelloWorld = require('../controller/hello-world');
  * @param   {String}    prefix
  * @return  {Express}   app
  * */
-const urls = function(app, prefix = '/') {
+export function urls(app, prefix = '/', views: any[]) {
 
     // Controllers
     app.use(prefix, new HelloWorld().asView());
@@ -25,15 +25,19 @@ const urls = function(app, prefix = '/') {
     app.use(new ErrorHandler(app).handle);
 
     return app;
-};
+}
+
+urls(app, '/', [
+
+]);
 
 /**
  * Handler for 404 responses.
  * Will instantiate a NotFoundError
  * @function    notFoundHandler
  * */
-const notFoundHandler = (req, res, next) => {
+export function notFoundHandler (req, res, next) {
     return next(new NotFoundError(`Could not find page ${req.originalUrl}`));
-};
+}
 
-module.exports = urls;
+//module.exports = urls;
