@@ -1,5 +1,6 @@
 import Controller from './controllers/controller';
 import AuthController from './controllers/auth.controller';
+import { setupMongoose } from './database/database-setup';
 import { urls, notFoundHandler } from './routes';
 import {
     HttpError,
@@ -52,6 +53,7 @@ if (!Array.prototype.includes) {
 module.exports = {
     controllers: { Controller, AuthController },
     routes: { urls, notFoundHandler },
+    database: { setupMongoose },
     errors: {
         ErrorHandler,
         HttpError,
