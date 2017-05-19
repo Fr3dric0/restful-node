@@ -218,4 +218,3 @@ urls(app, '/api', [
     { controller: new ExampleController() }
 ]);
 ```
-
