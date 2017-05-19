@@ -160,4 +160,40 @@ To setup a connection use, `setupMongoose` in `require("restful-node").database`
 
 Checkout out the examples for how to interact with the model.
 
+## Examples
 
+### Controller
+
+```js
+// example.controller.js
+
+class ExampleController extends Controller {
+
+    constructor(prefix = '') {
+        super(prefix);
+    }
+
+    // Override
+    list(req, res, next) {
+        res.status(200).json({ title: 'hello world' });
+    }
+}
+
+module.exports = ExampleController;
+
+// user.controller.js
+const { JWT } = require('restful-node').auth;
+class UserController extends JWTAuthController {
+
+    constructor(prefix, secret) {
+        super(prefix, {secret, ttl: 5920392);
+        this.ignoreMethods.push('create');
+    }
+
+    create(req, res, next) {
+        res.status(200).json({
+            token: new JWT(this.secret).create({uid: 1})
+        });
+    }
+}
+```

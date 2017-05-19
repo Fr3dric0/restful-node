@@ -7,13 +7,8 @@ class HelloWorld extends AuthController {
   constructor () {
     super();
     this.model = HelloWorldModel;
-    this.authFilters.push(requireNothing);
   }
   
-}
-
-function requireNothing (req) {
-  throw new BadRequestError('Bad values');
 }
 
 module.exports = HelloWorld;
