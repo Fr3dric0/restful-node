@@ -1,5 +1,6 @@
 import Controller from './controllers/controller';
 import AuthController from './controllers/auth.controller';
+import FileController from './controllers/file.controller';
 import { setupMongoose } from './database/database-setup';
 import { urls, notFoundHandler } from './routes';
 import {
@@ -9,7 +10,8 @@ import {
     ErrorHandler,
     DuplicationError,
     ForbiddenError,
-    UnauthorizedError
+    UnauthorizedError,
+    EntityTooLargeError
 } from './errors';
 
 import Filter from './auth/filter';
@@ -17,6 +19,7 @@ import JWTFilter from './auth/jwt.filter';
 import JWT from './auth/jwt';
 import JWTAuthController from './controllers/jwt-auth.controller';
 
+import { MimeTypes } from './files/mimetypes';
 
 // Pollyfills
 declare global {
@@ -58,7 +61,12 @@ if (!Array.prototype.includes) {
 }
 
 module.exports = {
-    controllers: { Controller, AuthController, JWTAuthController },
+    controllers: {
+        Controller,
+        AuthController,
+        JWTAuthController,
+        FileController
+    },
     routes: { urls, notFoundHandler },
     database: { setupMongoose },
     errors: {
@@ -68,11 +76,15 @@ module.exports = {
         BadRequestError,
         DuplicationError,
         ForbiddenError,
-        UnauthorizedError
+        UnauthorizedError,
+        EntityTooLargeError
     },
     auth: {
         Filter,
         JWT,
         JWTFilter
+    },
+    files: {
+        MimeTypes
     }
 };

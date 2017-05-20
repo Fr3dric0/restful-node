@@ -9,9 +9,6 @@ export class HttpError extends Error {
     }
 }
 
-/**
- * 404 Not Found Responses
- * */
 export class NotFoundError extends HttpError {
 
     constructor(message = null) {
@@ -20,9 +17,6 @@ export class NotFoundError extends HttpError {
     }
 }
 
-/**
- * 400 responses
- * */
 export class BadRequestError extends HttpError {
 
     constructor(message) {
@@ -42,5 +36,12 @@ export class UnauthorizedError extends HttpError {
     constructor(message) {
         super(message);
         this.status = 401;
+    }
+}
+
+export class EntityTooLargeError extends HttpError {
+    constructor(message) {
+        super(message);
+        this.status = 413;
     }
 }

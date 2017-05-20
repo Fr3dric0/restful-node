@@ -5,7 +5,8 @@ import {
     NotFoundError,
     BadRequestError,
     UnauthorizedError,
-    ForbiddenError
+    ForbiddenError,
+    EntityTooLargeError
 } from './http.error';
 
 export {
@@ -17,5 +18,6 @@ export {
     NotFoundError,
     BadRequestError,
     UnauthorizedError,
-    ForbiddenError
+    ForbiddenError,
+    EntityTooLargeError
 }
