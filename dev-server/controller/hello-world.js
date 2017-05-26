@@ -10,10 +10,6 @@ class HelloWorld extends FileController {
     this.model = HelloWorldModel;
   }
   
-  create(req, res, next) {
-    res.json({file: req.file});
-  }
-  
 }
 
 module.exports = HelloWorld;

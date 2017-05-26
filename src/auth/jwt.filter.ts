@@ -14,20 +14,22 @@ export default class JWTFilter extends Filter {
         this.jwt = new JWT(secret, ttl);
     }
 
-    canAccess(req: any, res: any): Promise<any> {
-        return new Promise((rsv, rr) => {
-            if (!req.headers['authorization']) {
-                return rr(new UnauthorizedError('Missing Authorization header'));
-            } else if (!req.headers['authorization'].startsWith('bearer ')) {
-                return rr(new UnauthorizedError('Authorization header must be prefixed with "bearer "'));
-            }
+    async canAccess(req: any, res: any): Promise<any> {
+        if (!req.headers['authorization']) {
+            throw new UnauthorizedError('Missing Authorization header');
+        } else if (!req.headers['authorization'].startsWith('bearer ')) {
+            throw new UnauthorizedError('Authorization header must be prefixed with "bearer "');
+        }
 
-            this.jwt.verify(req.headers['authorization'].substring('bearer '.length))
-                .then((decoded) => {
-                    req.decoded = decoded;
-                    rsv(true);
-                })
-                .catch(err => rr(new ForbiddenError(err.message)));
-        });
+        let decoded;
+        try {
+            decoded = await this.jwt.verify(
+                req.headers['authorization'].substring('bearer '.length));
+        } catch (e) {
+            throw new ForbiddenError(e.message);
+        }
+        req.decoded = decoded;
+
+        return true;
     }
 }
