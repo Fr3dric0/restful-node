@@ -8,7 +8,6 @@ class HelloWorld extends FileController {
   constructor () {
     super('', {root: 'dev-server/resources'});
     this.model = HelloWorldModel;
-    this.ignoreMethods.push('create');
   }
   
   create(req, res, next) {

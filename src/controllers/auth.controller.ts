@@ -10,63 +10,80 @@ export default class AuthController extends Controller {
         this.runAuthFilter = this.runAuthFilter.bind(this);
     }
 
-    listWrapper(req, res, next) {
+    async listWrapper(req, res, next) {
         if (this.ignoreMethods.includes('list')) {
             return super.listWrapper(req, res, next);
         }
 
-        this.runAuthFilter(req, res)
-            .then(() => super.listWrapper(req, res, next))
-            .catch(err => next(err));
+        try {
+            await this.runAuthFilter(req, res);
+        } catch (e) {
+            return next(e);
+        }
+
+        super.listWrapper(req, res, next);
     }
 
-    retrieveWrapper(req, res, next) {
+    async retrieveWrapper(req, res, next) {
         if (this.ignoreMethods.includes('retrieve')) {
             return super.retrieveWrapper(req, res, next);
         }
 
-        this.runAuthFilter(req, res)
-            .then(() => super.retrieveWrapper(req, res, next))
-            .catch(err => next(err));
+        try {
+            await this.runAuthFilter(req, res);
+        } catch (e) {
+            return next(e);
+        }
+
+        super.retrieveWrapper(req, res, next);
     }
 
-    createWrapper(req, res, next) {
+    async createWrapper(req, res, next) {
         if (this.ignoreMethods.includes('create')) {
             return super.createWrapper(req, res, next);
         }
 
-        this.runAuthFilter(req, res)
-            .then(() => super.createWrapper(req, res, next))
-            .catch(err => next(err));
+        try {
+            await this.runAuthFilter(req, res);
+        } catch (e) {
+            return next(e);
+        }
+
+        super.createWrapper(req, res, next)
     }
 
-    updateWrapper(req, res, next) {
+    async updateWrapper(req, res, next) {
         if (this.ignoreMethods.includes('update')) {
             return super.updateWrapper(req, res, next);
         }
 
-        this.runAuthFilter(req, res)
-            .then(() => super.updateWrapper(req, res, next))
-            .catch(err => next(err));
+        try {
+            await this.runAuthFilter(req, res);
+        } catch (e) {
+            return next(e);
+        }
+
+        super.updateWrapper(req, res, next);
     }
 
-    destroyWrapper(req, res, next) {
+    async destroyWrapper(req, res, next) {
         if (this.ignoreMethods.includes('destroy')) {
             return super.destroyWrapper(req, res, next);
         }
 
-        this.runAuthFilter(req, res)
-            .then(() => super.destroyWrapper(req, res, next))
-            .catch(err => next(err));
+        try {
+            await this.runAuthFilter(req, res);
+        } catch (e) {
+            return next(e);
+        }
+
+        super.destroyWrapper(req, res, next);
     }
 
-    private runAuthFilter(req, res): Promise<any> {
-        return new Promise((rsv, rr) => {
-            Promise
-                .all(this.mapAuthFilters(req, res))
-                .then((results) => rsv())
-                .catch(err => rr(err));
-        });
+    private async runAuthFilter(req, res): Promise<any> {
+        Promise.all(this.mapAuthFilters(req, res))
+            .then((results) => {})
+            .catch(err => {throw err;});
     }
 
     private mapAuthFilters(req, res): any {

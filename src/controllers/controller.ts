@@ -37,84 +37,92 @@ export default class Controller {
         this.asView = this.asView.bind(this);
     }
 
-    listWrapper(req, res, next) {
-        this.runFilters(req, res, next)
-            .then(() => {
-                // Do a standard query to the database
-                req = this._attachDb(req);
-                this.callHttpMethod(req, res, next, this.list);
-            })
-            .catch(e => next(e));
+    async listWrapper(req, res, next) {
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+        Controller.callHttpMethod(req, res, next, this.list);
     }
 
-    retrieveWrapper(req, res, next) {
-        this.runFilters(req, res, next)
-            .then(() => {
-                req = this._attachDb(req);
+    async retrieveWrapper(req, res, next) {
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
 
-                // Skip loading of content
-                // if no content exists
-                if (!req.params.id && !this.model) {
-                    return this.callHttpMethod(req, res, next, this.retrieve);
-                }
+        req = this._attachDb(req);
 
-                let query = this._setPagination(
-                    this.model.findOne({_id: req.params.id}), req);
+        // Skip loading of content
+        // if no content exists
+        if (!req.params.id && !this.model) {
+            return Controller.callHttpMethod(req, res, next, this.retrieve);
+        }
 
-                query
-                    .then((data) => {
-                        req.db.data[req.db.name] = data;
-                        this.callHttpMethod(req, res, next, this.retrieve);
-                    })
-                    .catch(err => next(err));
-            })
-            .catch(e => next(e));
+        let data;
+        try {
+            data = await this._setPagination(
+                this.model.findOne({_id: req.params.id}), req);
+        } catch(e) {
+            return next(e);
+        }
+
+        req.db.data[req.db.name] = data;
+        Controller.callHttpMethod(req, res, next, this.retrieve);
     }
 
-    createWrapper(req, res, next) {
-        this.runFilters(req, res, next)
-            .then(() => {
-                req = this._attachDb(req);
-                this.callHttpMethod(req, res, next, this.create);
-            })
-            .catch(e => next(e));
+    async createWrapper(req, res, next) {
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+        Controller.callHttpMethod(req, res, next, this.create);
     }
 
-    updateWrapper(req, res, next) {
-        this.runFilters(req, res, next)
-            .then(() => {
-                req = this._attachDb(req);
+    async updateWrapper(req, res, next) {
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
 
-                if (!req.params.id || !this.model) {
-                    return this.callHttpMethod(req, res, next, this.update);
-                }
+        req = this._attachDb(req);
 
-                this.model.findOne({_id: req.params.id})
-                    .then((data) => {
-                        // There is on point in continuing the
-                        // update, if there is no resource
-                        // to update.
-                        if (!data) {
-                            return next(new NotFoundError(`Cannot find resource ${req.params.id}`));
-                        }
+        if (!req.params.id || !this.model) {
+            return Controller.callHttpMethod(req, res, next, this.update);
+        }
 
-                        req.db.data[req.db.name] = data;
+        let data;
+        try {
+            data = await this.model.findOne({_id: req.params.id});
+        } catch (e) {
+            return next(e);
+        }
 
-                        this.callHttpMethod(req, res, next, this.update);
-                    })
-                    .catch(err => next(err));
-            })
-            .catch(e => next(e));
+        if (!data) {
+            return next(new NotFoundError(`Cannot find resource ${req.params.id}`));
+        }
 
+        req.db.data[req.db.name] = data;
+        Controller.callHttpMethod(req, res, next, this.update);
     }
 
-    destroyWrapper(req, res, next) {
-        this.runFilters(req, res, next)
-            .then(() => {
-                req = this._attachDb(req);
-                return this.callHttpMethod(req, res, next, this.destroy);
-            })
-            .catch(e => next(e));
+    async destroyWrapper(req, res, next) {
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+        return Controller.callHttpMethod(req, res, next, this.destroy);
     }
 
     /**
@@ -191,7 +199,6 @@ export default class Controller {
         this.model.remove({_id: id})
             .then(result => res.status(204).json(result))
             .catch(err => next(err));
-
     }
 
     /**
@@ -204,38 +211,21 @@ export default class Controller {
         const router = express.Router();
         const url = `/${this.prefix ? this.prefix + '/' : ''}`;
 
-        // Extrapolate the middleware
-        // functions if they exists
-        // TODO:ffl - allot of duplication here...
-        if (this.middleware.length > 0) {
-            router.post(url, ...this.middleware, this.createWrapper);
-            router.get(url, ...this.middleware, this.listWrapper);
-            router.get(`${url}:id`, ...this.middleware, this.retrieveWrapper);
-            router.delete(`${url}:id`, ...this.middleware, this.destroyWrapper);
+        router.post(url, ...this.middleware, this.createWrapper);
+        router.get(url, ...this.middleware, this.listWrapper);
+        router.get(`${url}:id`, ...this.middleware, this.retrieveWrapper);
+        router.delete(`${url}:id`, ...this.middleware, this.destroyWrapper);
 
-            if (this.usePatch) {
-                router.patch(`${url}:id`, ...this.middleware, this.updateWrapper);
-            } else {
-                router.put(`${url}:id`, ...this.middleware, this.updateWrapper);
-            }
-
+        if (this.usePatch) {
+            router.patch(`${url}:id`, ...this.middleware, this.updateWrapper);
         } else {
-            router.post(url, this.createWrapper);
-            router.get(url, this.listWrapper);
-            router.get(`${url}:id`, this.retrieveWrapper);
-            router.delete(`${url}:id`, this.destroyWrapper);
-
-            if (this.usePatch) {
-                router.patch(`${url}:id`, this.updateWrapper);
-            } else {
-                router.put(`${url}:id`, this.updateWrapper);
-            }
+            router.put(`${url}:id`, ...this.middleware, this.updateWrapper);
         }
 
         return router;
     }
 
-    private callHttpMethod(req, res, next, func) {
+    private static callHttpMethod(req, res, next, func) {
         try {
             func(req, res, next);
         } catch (e) {
