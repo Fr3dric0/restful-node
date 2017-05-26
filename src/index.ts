@@ -3,16 +3,7 @@ import AuthController from './controllers/auth.controller';
 import FileController from './controllers/file.controller';
 import { setupMongoose } from './database/database-setup';
 import { urls, notFoundHandler } from './routes';
-import {
-    HttpError,
-    NotFoundError,
-    BadRequestError,
-    ErrorHandler,
-    DuplicationError,
-    ForbiddenError,
-    UnauthorizedError,
-    EntityTooLargeError
-} from './errors';
+import * as errors from './errors';
 
 import Filter from './auth/filter';
 import JWTFilter from './auth/jwt.filter';
@@ -61,6 +52,8 @@ if (!Array.prototype.includes) {
 }
 
 module.exports = {
+    errors,
+
     controllers: {
         Controller,
         AuthController,
@@ -69,16 +62,6 @@ module.exports = {
     },
     routes: { urls, notFoundHandler },
     database: { setupMongoose },
-    errors: {
-        ErrorHandler,
-        HttpError,
-        NotFoundError,
-        BadRequestError,
-        DuplicationError,
-        ForbiddenError,
-        UnauthorizedError,
-        EntityTooLargeError
-    },
     auth: {
         Filter,
         JWT,

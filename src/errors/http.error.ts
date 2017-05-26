@@ -45,3 +45,10 @@ export class EntityTooLargeError extends HttpError {
         this.status = 413;
     }
 }
+
+export class MethodNotAllowed extends HttpError {
+    constructor(message = 'Method Not Allowed') {
+        super(message);
+        this.status = 405;
+    }
+}

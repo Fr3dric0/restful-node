@@ -6,7 +6,8 @@ import {
     BadRequestError,
     UnauthorizedError,
     ForbiddenError,
-    EntityTooLargeError
+    EntityTooLargeError,
+    MethodNotAllowed
 } from './http.error';
 
 export {
@@ -19,5 +20,6 @@ export {
     BadRequestError,
     UnauthorizedError,
     ForbiddenError,
-    EntityTooLargeError
+    EntityTooLargeError,
+    MethodNotAllowed
 }

@@ -4,7 +4,7 @@ import * as multer from 'multer';
 import FileValidatorFilter from '../files/file-validator.filter';
 import FileMoverFilter from '../files/file-mover.filter';
 import { ls, rm } from '../files/file-handler';
-import { BadRequestError, HttpError, NotFoundError } from '../errors/http.error';
+import { BadRequestError, MethodNotAllowed, NotFoundError } from '../errors/http.error';
 
 export default class FileController extends AuthController {
     protected root: string = null;
@@ -38,7 +38,7 @@ export default class FileController extends AuthController {
      * */
     async create(req, res, next) {
         if (this.root == null || this.root == undefined) {
-            return res.sendStatus(405);
+            return next(new MethodNotAllowed());
         }
 
         if (!req.file) {
@@ -61,7 +61,7 @@ export default class FileController extends AuthController {
      * */
     async list(req, res, next) {
         if (this.root == null || this.root == undefined) {
-            return res.sendStatus(405);
+            return next(new MethodNotAllowed());
         }
 
         let items = await ls(this.root);
@@ -73,7 +73,7 @@ export default class FileController extends AuthController {
      * */
     async destroy(req, res, next) {
         if (this.root == null || this.root == undefined) {
-            return res.sendStatus(405);
+            return next(new MethodNotAllowed());
         }
 
         let items = await ls(this.root);

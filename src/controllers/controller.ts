@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { NotFoundError } from '../errors';
+import { NotFoundError, MethodNotAllowed } from '../errors/http.error';
 import Filter from '../auth/filter';
 
 /**
@@ -12,6 +12,7 @@ export default class Controller {
     protected usePatch: boolean = true; // Will use PATCH instead of PUT on update
     protected fields: string[] = []; // Database fields (not implemented)
     protected middleware: Function[] = [];
+    protected disable: string[] = [];
 
     // Filters used to
     // handle validation etc.
@@ -38,6 +39,10 @@ export default class Controller {
     }
 
     async listWrapper(req, res, next) {
+        if (this.disable.includes('list')) {
+            return next(new MethodNotAllowed());
+        }
+
         try {
             await this.runFilters(req, res, next);
         } catch (e) {
@@ -49,6 +54,10 @@ export default class Controller {
     }
 
     async retrieveWrapper(req, res, next) {
+        if (this.disable.includes('retrieve')) {
+            return next(new MethodNotAllowed());
+        }
+
         try {
             await this.runFilters(req, res, next);
         } catch (e) {
@@ -76,6 +85,10 @@ export default class Controller {
     }
 
     async createWrapper(req, res, next) {
+        if (this.disable.includes('create')) {
+            return next(new MethodNotAllowed());
+        }
+
         try {
             await this.runFilters(req, res, next);
         } catch (e) {
@@ -87,6 +100,10 @@ export default class Controller {
     }
 
     async updateWrapper(req, res, next) {
+        if (this.disable.includes('update')) {
+            return next(new MethodNotAllowed());
+        }
+
         try {
             await this.runFilters(req, res, next);
         } catch (e) {
@@ -115,6 +132,10 @@ export default class Controller {
     }
 
     async destroyWrapper(req, res, next) {
+        if (this.disable.includes('destroy')) {
+            return next(new MethodNotAllowed());
+        }
+
         try {
             await this.runFilters(req, res, next);
         } catch (e) {
