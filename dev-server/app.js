@@ -39,9 +39,11 @@ const db = setupMongoose({ database: 'hello-world' });
 // Also handles errors   //
 ///////////////////////////
 const HelloWorld = require('./controller/hello-world');
+const BasicController = require('./controller/basic-controller');
 
 const { urls } = eca.routes;
 urls(app, '/api', [
+  { url: '/basic', controller: new BasicController()},
   { controller: new HelloWorld() }
 ]);
 

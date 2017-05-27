@@ -1,4 +1,5 @@
-import Controller from './controllers/rest-controller';
+import Controller from './controllers/controller';
+import RestController from './controllers/rest-controller';
 import AuthController from './controllers/auth.controller';
 import FileController from './controllers/file.controller';
 import { setupMongoose } from './database/database-setup';
@@ -56,6 +57,7 @@ module.exports = {
 
     controllers: {
         Controller,
+        RestController,
         AuthController,
         JWTAuthController,
         FileController
