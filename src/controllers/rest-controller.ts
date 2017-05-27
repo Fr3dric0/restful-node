@@ -6,7 +6,7 @@ import Filter from '../auth/filter';
  *
  * @module  controller/response
  * */
-export default class Controller {
+export default class RestController {
     private model: any = null;
     protected prefix: string; // Url prefix
     protected usePatch: boolean = true; // Will use PATCH instead of PUT on update
@@ -50,7 +50,7 @@ export default class Controller {
         }
 
         req = this._attachDb(req);
-        Controller.callHttpMethod(req, res, next, this.list);
+        RestController.callHttpMethod(req, res, next, this.list);
     }
 
     async retrieveWrapper(req, res, next) {
@@ -69,7 +69,7 @@ export default class Controller {
         // Skip loading of content
         // if no content exists
         if (!req.params.id && !this.model) {
-            return Controller.callHttpMethod(req, res, next, this.retrieve);
+            return RestController.callHttpMethod(req, res, next, this.retrieve);
         }
 
         let data;
@@ -81,7 +81,7 @@ export default class Controller {
         }
 
         req.db.data[req.db.name] = data;
-        Controller.callHttpMethod(req, res, next, this.retrieve);
+        RestController.callHttpMethod(req, res, next, this.retrieve);
     }
 
     async createWrapper(req, res, next) {
@@ -96,7 +96,7 @@ export default class Controller {
         }
 
         req = this._attachDb(req);
-        Controller.callHttpMethod(req, res, next, this.create);
+        RestController.callHttpMethod(req, res, next, this.create);
     }
 
     async updateWrapper(req, res, next) {
@@ -113,7 +113,7 @@ export default class Controller {
         req = this._attachDb(req);
 
         if (!req.params.id || !this.model) {
-            return Controller.callHttpMethod(req, res, next, this.update);
+            return RestController.callHttpMethod(req, res, next, this.update);
         }
 
         let data;
@@ -128,7 +128,7 @@ export default class Controller {
         }
 
         req.db.data[req.db.name] = data;
-        Controller.callHttpMethod(req, res, next, this.update);
+        RestController.callHttpMethod(req, res, next, this.update);
     }
 
     async destroyWrapper(req, res, next) {
@@ -143,7 +143,7 @@ export default class Controller {
         }
 
         req = this._attachDb(req);
-        return Controller.callHttpMethod(req, res, next, this.destroy);
+        return RestController.callHttpMethod(req, res, next, this.destroy);
     }
 
     /**

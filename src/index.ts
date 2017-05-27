@@ -1,4 +1,4 @@
-import Controller from './controllers/controller';
+import Controller from './controllers/rest-controller';
 import AuthController from './controllers/auth.controller';
 import FileController from './controllers/file.controller';
 import { setupMongoose } from './database/database-setup';

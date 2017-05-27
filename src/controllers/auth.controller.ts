@@ -1,7 +1,7 @@
-import Controller from './controller';
+import RestController from './rest-controller';
 import Filter from '../auth/filter';
 
-export default class AuthController extends Controller {
+export default class AuthController extends RestController {
     protected authFilters: Filter[] = [];
     protected ignoreMethods: string[] = [];
 

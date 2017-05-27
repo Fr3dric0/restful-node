@@ -1,4 +1,4 @@
-import Controller from '../controllers/controller';
+import Controller from '../controllers/rest-controller';
 
 export interface Route {
     url?: string;
