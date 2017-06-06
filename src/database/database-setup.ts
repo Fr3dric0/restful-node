@@ -8,24 +8,24 @@ import * as mongoose from 'mongoose';
  * @module      config/db
  * @function    setupMongoose
  * */
-export const setupMongoose = (config: DBConfig) => {
-  mongoose.Promise = global.Promise;
-  
-  mongoose.connect(
-    `mongodb://${!!(config.username && config.pwd) ? (config.username + ':' + config.pwd + '@') : ''}${config.domain || 'localhost'}:${config.port || 27017}/${config.database}`
-  );
-  
-  const db = mongoose.connection;
-  db.on('error', onConnectionError);
-  db.on('connection', onConnectionSuccess);
-  
-  return db;
-};
+export function setupMongoose(config: DBConfig) {
+    return new Promise((rsv, rr) => {
+        mongoose.Promise = global.Promise;
+
+        mongoose.connect(
+            `mongodb://${!!(config.username && config.pwd) ? (config.username + ':' + config.pwd + '@') : ''}${config.domain || 'localhost'}:${config.port || 27017}/${config.database}`
+        );
+
+        const db = mongoose.connection;
+        db.on('error', (err) => rr(err));
+        db.on('connection', () => rsv(db));
+    });
+}
 
 export const onConnectionSuccess = () => {
-  console.log('Successfully connected to database');
+    console.log('Successfully connected to database');
 };
 
 export const onConnectionError = (err) => {
-  console.error(err);
+    console.error(err);
 };

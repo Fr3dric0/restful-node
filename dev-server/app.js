@@ -13,13 +13,13 @@ const app = express();
 // responses, if NODE_ENV is not in production
 let logger = null;
 if (app.get('env') === 'production') {
-  logger = morgan('combined', {
-    skip: function (req, res) {
-      return res.statusCode < 400 // Only log messages with error type severity
-    }
-  });
+    logger = morgan('combined', {
+        skip: function (req, res) {
+            return res.statusCode < 400 // Only log messages with error type severity
+        }
+    });
 } else {
-  logger = morgan('dev');
+    logger = morgan('dev');
 }
 
 app.use(logger);
@@ -32,7 +32,11 @@ app.use(cookieParser());
 // Provide configuration //
 // as parameter          //
 ///////////////////////////
-const db = setupMongoose({ database: 'hello-world' });
+setupMongoose({ database: 'hello-world' })
+    .then((db) => {
+        console.log('Database connection established');
+    })
+    .catch( err => {throw err});
 
 ///////////////////////////
 //  ROUTE REGISTRATION   //
@@ -43,8 +47,8 @@ const BasicController = require('./controller/basic-controller');
 
 const { urls } = eca.routes;
 urls(app, '/api', [
-  { url: '/basic', controller: new BasicController()},
-  { controller: new HelloWorld() }
+    { url: '/basic', controller: new BasicController() },
+    { controller: new HelloWorld() }
 ]);
 
 module.exports = app;
