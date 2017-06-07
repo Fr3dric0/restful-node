@@ -80,10 +80,12 @@ export default class AuthController extends RestController {
         super.destroyWrapper(req, res, next);
     }
 
-    private async runAuthFilter(req, res): Promise<any> {
-        Promise.all(this.mapAuthFilters(req, res))
-            .then((results) => {})
-            .catch(err => {throw err;});
+    private runAuthFilter(req, res): Promise<any> {
+        return new Promise((rsv, rr) => {
+            Promise.all(this.mapAuthFilters(req, res))
+                .then((results) => rsv())
+                .catch(err => rr(err));
+        })
     }
 
     private mapAuthFilters(req, res): any {
