@@ -13,6 +13,7 @@ export default class RestController {
     protected fields: string[] = []; // Database fields (not implemented)
     protected middleware: Function[] = [];
     protected disable: string[] = [];
+    protected ignoreParamOn: string[] = []; // Gives the option to ignore `id` on urls
 
     // Filters used to
     // handle validation etc.
@@ -231,17 +232,35 @@ export default class RestController {
     asView() {
         const router = express.Router();
         const url = `/${this.prefix ? this.prefix + '/' : ''}`;
+        const modifyUrl = (method) =>
+            `${url}${!this.ignoreParamOn.includes(method) ? ':id' : ''}`;
 
+        // Create
         router.post(url, ...this.middleware, this.createWrapper);
-        router.get(url, ...this.middleware, this.listWrapper);
-        router.get(`${url}:id`, ...this.middleware, this.retrieveWrapper);
-        router.delete(`${url}:id`, ...this.middleware, this.destroyWrapper);
 
+        // List
+        router.get(url, ...this.middleware, this.listWrapper);
+
+        // Retrieve
+        router.get(
+            `${url}:id`,
+            ...this.middleware,
+            this.retrieveWrapper
+        );
+
+        // Update
         if (this.usePatch) {
-            router.patch(`${url}:id`, ...this.middleware, this.updateWrapper);
+            router.patch(modifyUrl('update'), ...this.middleware, this.updateWrapper);
         } else {
-            router.put(`${url}:id`, ...this.middleware, this.updateWrapper);
+            router.put(modifyUrl('update'), ...this.middleware, this.updateWrapper);
         }
+
+        // Delete
+        router.delete(
+            modifyUrl('destroy'),
+            ...this.middleware,
+            this.destroyWrapper
+        );
 
         return router;
     }
