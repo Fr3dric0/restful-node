@@ -10,7 +10,7 @@ import * as mongoose from 'mongoose';
  * */
 export function setupMongoose(config: DBConfig) {
     return new Promise((rsv, rr) => {
-        mongoose.Promise = global.Promise;
+        mongoose.Promise = global.Promise; // TODO:ffl - Don't work as expected
 
         mongoose.connect(
             `mongodb://${!!(config.username && config.pwd) ? (config.username + ':' + config.pwd + '@') : ''}${config.domain || 'localhost'}:${config.port || 27017}/${config.database}`

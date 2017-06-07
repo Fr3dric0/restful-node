@@ -7,7 +7,7 @@ import Filter from '../auth/filter';
  * @module  controller/response
  * */
 export default class RestController {
-    private model: any = null;
+    protected model: any = null;
     protected prefix: string; // Url prefix
     protected usePatch: boolean = true; // Will use PATCH instead of PUT on update
     protected fields: string[] = []; // Database fields (not implemented)
