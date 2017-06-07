@@ -1,6 +1,6 @@
-const { Controller } = require('../../dist').controllers;
+const { RestController } = require('../../dist').controllers;
 
-class BasicController extends Controller {
+class BasicController extends RestController {
 
   
   async get(req, res, next) {

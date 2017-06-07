@@ -68,7 +68,7 @@ export default class RestController {
 
         // Skip loading of content
         // if no content exists
-        if (!req.params.id && !this.model) {
+        if (!req.params.id || !this.model) {
             return RestController.callHttpMethod(req, res, next, this.retrieve);
         }
 
