@@ -18,7 +18,6 @@ import { Route } from './route';
  * @return  {Express}   app
  * */
 export function urls(app, prefix: string, views: Route[]) {
-
     for (const view of views) {
         if (!view.controller) {
             continue;
@@ -32,7 +31,7 @@ export function urls(app, prefix: string, views: Route[]) {
     }
 
     // Error Handlers
-    app.use(prefix, notFoundHandler); // 404 Handler, place last
+    app.use(prefix, notFoundHandler); // 404 Handler
     app.use(new ErrorHandler(app).handle);
 
     return app;

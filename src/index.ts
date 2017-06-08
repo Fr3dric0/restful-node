@@ -13,6 +13,8 @@ import JWTAuthController from './controllers/jwt-auth.controller';
 
 import { MimeTypes } from './files/mimetypes';
 
+import { settings } from './setup';
+
 // Pollyfills
 declare global {
     interface Array<T> {
@@ -64,12 +66,7 @@ module.exports = {
     },
     routes: { urls, notFoundHandler },
     database: { setupMongoose },
-    auth: {
-        Filter,
-        JWT,
-        JWTFilter
-    },
-    files: {
-        MimeTypes
-    }
+    auth: { Filter, JWT, JWTFilter },
+    files: { MimeTypes },
+    setup: { settings }
 };

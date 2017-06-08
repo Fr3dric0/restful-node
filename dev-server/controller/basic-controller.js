@@ -2,15 +2,16 @@ const { RestController } = require('../../dist').controllers;
 
 class BasicController extends RestController {
     
-    constructor () {
-        super();
-        this.ignoreParamOn.push('update')
+    constructor (name) {
+        super('', { pk: 'title' });
+        this.ignorePkOn.push('update');
+        this.model = require('../model/hello-world');
     }
+    
     
     async update(req, res, next) {
-        res.json('hello');
+        res.send(req.settings);
     }
-    
     
 }
 

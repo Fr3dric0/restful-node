@@ -13,7 +13,8 @@ export default class RestController {
     protected fields: string[] = []; // Database fields (not implemented)
     protected middleware: Function[] = [];
     protected disable: string[] = [];
-    protected ignoreParamOn: string[] = []; // Gives the option to ignore `id` on urls
+    protected ignorePkOn: string[] = []; // Gives the option to ignore `id` on urls
+    private pk: string = 'id'; // Primary key (pk), used when handling single items
 
     // Filters used to
     // handle validation etc.
@@ -21,8 +22,9 @@ export default class RestController {
     // is called
     protected filters: Filter[] = [];
 
-    constructor(prefix = '') {
+    constructor(prefix = '', options: { pk?: string } = {}) {
         this.prefix = prefix;
+        this.pk = options.pk || this.pk;
 
         this.list = this.list.bind(this);
         this.retrieve = this.retrieve.bind(this);
@@ -39,117 +41,10 @@ export default class RestController {
         this.asView = this.asView.bind(this);
     }
 
-    async listWrapper(req, res, next) {
-        if (this.disable.includes('list')) {
-            return next(new MethodNotAllowed());
-        }
-
-        try {
-            await this.runFilters(req, res, next);
-        } catch (e) {
-            return next(e);
-        }
-
-        req = this._attachDb(req);
-        RestController.callHttpMethod(req, res, next, this.list);
-    }
-
-    async retrieveWrapper(req, res, next) {
-        if (this.disable.includes('retrieve')) {
-            return next(new MethodNotAllowed());
-        }
-
-        try {
-            await this.runFilters(req, res, next);
-        } catch (e) {
-            return next(e);
-        }
-
-        req = this._attachDb(req);
-
-        // Skip loading of content
-        // if no content exists
-        if (!req.params.id || !this.model) {
-            return RestController.callHttpMethod(req, res, next, this.retrieve);
-        }
-
-        let data;
-        try {
-            data = await this._setPagination(
-                this.model.findOne({_id: req.params.id}), req);
-        } catch(e) {
-            return next(e);
-        }
-
-        req.db.data[req.db.name] = data;
-        RestController.callHttpMethod(req, res, next, this.retrieve);
-    }
-
-    async createWrapper(req, res, next) {
-        if (this.disable.includes('create')) {
-            return next(new MethodNotAllowed());
-        }
-
-        try {
-            await this.runFilters(req, res, next);
-        } catch (e) {
-            return next(e);
-        }
-
-        req = this._attachDb(req);
-        RestController.callHttpMethod(req, res, next, this.create);
-    }
-
-    async updateWrapper(req, res, next) {
-        if (this.disable.includes('update')) {
-            return next(new MethodNotAllowed());
-        }
-
-        try {
-            await this.runFilters(req, res, next);
-        } catch (e) {
-            return next(e);
-        }
-
-        req = this._attachDb(req);
-
-        if (!req.params.id || !this.model) {
-            return RestController.callHttpMethod(req, res, next, this.update);
-        }
-
-        let data;
-        try {
-            data = await this.model.findOne({_id: req.params.id});
-        } catch (e) {
-            return next(e);
-        }
-
-        if (!data) {
-            return next(new NotFoundError(`Cannot find resource ${req.params.id}`));
-        }
-
-        req.db.data[req.db.name] = data;
-        RestController.callHttpMethod(req, res, next, this.update);
-    }
-
-    async destroyWrapper(req, res, next) {
-        if (this.disable.includes('destroy')) {
-            return next(new MethodNotAllowed());
-        }
-
-        try {
-            await this.runFilters(req, res, next);
-        } catch (e) {
-            return next(e);
-        }
-
-        req = this._attachDb(req);
-        return RestController.callHttpMethod(req, res, next, this.destroy);
-    }
-
     /**
-     * Method for listing items from a model
+     * Lists items from a model
      * @function    list
+     * @route       GET /
      * @param       req
      * @param       res
      * @param       next
@@ -170,10 +65,11 @@ export default class RestController {
 
     /**
      * Retrieves a single item from a model
-     * @function  retrieve
-     * @param     req
-     * @param     res
-     * @param     next
+     * @function retrieve
+     * @route GET /:<pk>
+     * @param req
+     * @param res
+     * @param next
      * */
     retrieve(req, res, next) {
         if (!this.model) {
@@ -187,20 +83,40 @@ export default class RestController {
         res.status(200).json(req.db.data[req.db.name]);
     }
 
+    /**
+     * Updates a specific item, primarily with the help of the
+     * primary key (pk), but can be specified to ignore the pk
+     * through the `ignorePkOn` list
+     * @function update
+     * @route PATCH /:<pk?> | PUT /:<pk?>
+     * @param req
+     * @param res
+     * @param next
+     * */
     update(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
 
-        const {id} = req.params;
-
-        this.model.findOneAndUpdate({_id: id}, {$set: req.body}, {new: true})
+        this.model.findOneAndUpdate(
+            this.getPkQuery(req),
+            { $set: req.body },
+            { new: true }
+        )
             .then((data) => {
                 res.status(data ? 200 : 404).json(data);
             })
             .catch(err => next(err));
     }
 
+    /**
+     * Creates a new resource
+     * @function create
+     * @route POST /
+     * @param req
+     * @param res
+     * @param next
+     * */
     create(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
@@ -211,17 +127,136 @@ export default class RestController {
             .catch(err => next(err));
     }
 
+    /**
+     * Removes a resource
+     * @function destroy
+     * @route DELETE /:<pk?>
+     * @param req
+     * @param res
+     * @param next
+     * */
     destroy(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
 
-        const {id} = req.params;
-
-        this.model.remove({_id: id})
+        this.model.remove(this.getPkQuery(req))
             .then(result => res.status(204).json(result))
             .catch(err => next(err));
     }
+
+    async listWrapper(req, res, next) {
+        if (this.disable.includes('list')) {
+            return next(new MethodNotAllowed());
+        }
+
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+        this.list(req, res, next);
+    }
+
+    async retrieveWrapper(req, res, next) {
+        if (this.disable.includes('retrieve')) {
+            return next(new MethodNotAllowed());
+        }
+
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+
+        // Skip loading of content
+        // if no content exists
+        if (!req.params[this.pk] || !this.model) {
+            return this.retrieve(req, res, next);
+        }
+
+
+        let data;
+        try {
+            data = await this._setPagination(
+                this.model.findOne(this.getPkQuery(req)), req);
+        } catch (e) {
+            return next(e);
+        }
+
+        req.db.data[req.db.name] = data;
+
+        this.retrieve(req, res, next);
+    }
+
+    async createWrapper(req, res, next) {
+        if (this.disable.includes('create')) {
+            return next(new MethodNotAllowed());
+        }
+
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+        this.create(req, res, next);
+    }
+
+    async updateWrapper(req, res, next) {
+        console.log('hello');
+        if (this.disable.includes('update')) {
+            return next(new MethodNotAllowed());
+        }
+
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+
+        if (!req.params[this.pk] || !this.model) {
+            return this.update(req, res, next);
+        }
+
+        let data;
+        try {
+            data = await this.model.findOne(this.getPkQuery(req));
+        } catch (e) {
+            return next(e);
+        }
+
+        if (!data) {
+            return next(new NotFoundError(`Cannot find resource ${req.params[this.pk]}`));
+        }
+
+        req.db.data[req.db.name] = data;
+        this.update(req, res, next)
+    }
+
+    async destroyWrapper(req, res, next) {
+        if (this.disable.includes('destroy')) {
+            return next(new MethodNotAllowed());
+        }
+
+        try {
+            await this.runFilters(req, res, next);
+        } catch (e) {
+            return next(e);
+        }
+
+        req = this._attachDb(req);
+        this.destroy(req, res, next);
+    }
+
+
 
     /**
      * Converts controller methods to
@@ -232,8 +267,8 @@ export default class RestController {
     asView() {
         const router = express.Router();
         const url = `/${this.prefix ? this.prefix + '/' : ''}`;
-        const modifyUrl = (method) =>
-            `${url}${!this.ignoreParamOn.includes(method) ? ':id' : ''}`;
+        const modifyUrl = (method = null) =>
+            `${url}${!this.ignorePkOn.includes(method) || method === null ? ':' + this.pk : ''}`;
 
         // Create
         router.post(url, ...this.middleware, this.createWrapper);
@@ -242,11 +277,7 @@ export default class RestController {
         router.get(url, ...this.middleware, this.listWrapper);
 
         // Retrieve
-        router.get(
-            `${url}:id`,
-            ...this.middleware,
-            this.retrieveWrapper
-        );
+        router.get(modifyUrl(), ...this.middleware, this.retrieveWrapper);
 
         // Update
         if (this.usePatch) {
@@ -262,15 +293,8 @@ export default class RestController {
             this.destroyWrapper
         );
 
+        // router.stack.forEach((s) => console.log(s.route.stack));
         return router;
-    }
-
-    private static callHttpMethod(req, res, next, func) {
-        try {
-            func(req, res, next);
-        } catch (e) {
-            return next(e);
-        }
     }
 
     private runFilters(req, res, next) {
@@ -281,6 +305,19 @@ export default class RestController {
         return this.filters
             .map(f => f && f.canAccess ? f.canAccess(req, res) : null)
             .filter(f => !!f);
+    }
+
+    /**
+     * Gives a mongoose-friendly
+     * query, for extracting items through
+     * the primary key (pk)
+     * */
+    private getPkQuery(req): object {
+        const query = {};
+        // If id is pk, then we must prefix the query with '_'
+        query[this.pk === 'id' ? '_id' : this.pk] = req.params[this.pk];
+
+        return query;
     }
 
     private _attachDb(req) {

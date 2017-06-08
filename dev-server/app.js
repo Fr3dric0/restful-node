@@ -4,25 +4,26 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const eca = require('../dist');
-const { setupMongoose } = eca.database;
+const restful = require('../dist');
 
 const app = express();
 
+
+app.use(restful.setup.settings(app, {
+    // Place configuration values
+}));
+
 // Set logger to only print detailed
 // responses, if NODE_ENV is not in production
-let logger = null;
-if (app.get('env') === 'production') {
-    logger = morgan('combined', {
+app.use(!app.restful.settings.debug ?
+    morgan('combined', {
         skip: function (req, res) {
-            return res.statusCode < 400 // Only log messages with error type severity
+            return res.statusCode < 400 // Only log requests of type error
         }
-    });
-} else {
-    logger = morgan('dev');
-}
+    }) :
+    morgan('dev')
+);
 
-app.use(logger);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
@@ -32,7 +33,7 @@ app.use(cookieParser());
 // Provide configuration //
 // as parameter          //
 ///////////////////////////
-setupMongoose({ database: 'hello-world' })
+restful.database.setupMongoose({ database: 'hello-world' })
     .then((db) => {
         console.log('Database connection established');
     })
@@ -45,7 +46,7 @@ setupMongoose({ database: 'hello-world' })
 const HelloWorld = require('./controller/hello-world');
 const BasicController = require('./controller/basic-controller');
 
-const { urls } = eca.routes;
+const { urls } = restful.routes;
 urls(app, '/api', [
     { url: '/basic', controller: new BasicController() },
     { controller: new HelloWorld() }
