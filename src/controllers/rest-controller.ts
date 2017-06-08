@@ -209,7 +209,6 @@ export default class RestController {
     }
 
     async updateWrapper(req, res, next) {
-        console.log('hello');
         if (this.disable.includes('update')) {
             return next(new MethodNotAllowed());
         }

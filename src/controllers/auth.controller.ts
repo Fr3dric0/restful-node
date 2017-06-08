@@ -5,8 +5,8 @@ export default class AuthController extends RestController {
     protected authFilters: Filter[] = [];
     protected ignoreMethods: string[] = [];
 
-    constructor(prefix = '') {
-        super(prefix);
+    constructor(prefix = '', config = {}) {
+        super(prefix, config);
         this.runAuthFilter = this.runAuthFilter.bind(this);
     }
 

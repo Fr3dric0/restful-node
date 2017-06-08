@@ -13,7 +13,7 @@ export default class FileController extends AuthController {
     protected maxSize: number = -1;
 
     constructor(prefix = '', options: { root?: string, fieldname?: string, maxSize?: number } = {}) {
-        super(prefix);
+        super(prefix, options);
 
         this.root = options.root || this.root;
         this.upload = multer({dest: this.root});
