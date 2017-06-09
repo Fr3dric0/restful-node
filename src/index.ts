@@ -11,6 +11,7 @@ import JWTFilter from './auth/jwt.filter';
 import JWT from './auth/jwt';
 import JWTAuthController from './controllers/jwt-auth.controller';
 
+import { mv, rm, ls } from './files/file-handler';
 import { MimeTypes } from './files/mimetypes';
 
 import { settings } from './setup';
@@ -67,6 +68,6 @@ module.exports = {
     routes: { urls, notFoundHandler },
     database: { setupMongoose },
     auth: { Filter, JWT, JWTFilter },
-    files: { MimeTypes },
+    files: { MimeTypes, ls, rm, mv },
     setup: { settings }
 };

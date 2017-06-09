@@ -14,7 +14,7 @@ export default class RestController {
     protected middleware: Function[] = [];
     protected disable: string[] = [];
     protected ignorePkOn: string[] = []; // Gives the option to ignore `id` on urls
-    private pk: string = 'id'; // Primary key (pk), used when handling single items
+    protected pk: string = 'id'; // Primary key (pk), used when handling single items
 
     // Filters used to
     // handle validation etc.
@@ -24,6 +24,11 @@ export default class RestController {
 
     constructor(prefix = '', options: { pk?: string } = {}) {
         this.prefix = prefix;
+
+        if (this.prefix && this.prefix.startsWith('/')) {
+            this.prefix = this.prefix.substring(1); // Skip first letter
+        }
+
         this.pk = options.pk || this.pk;
 
         this.list = this.list.bind(this);
@@ -179,7 +184,6 @@ export default class RestController {
             return this.retrieve(req, res, next);
         }
 
-
         let data;
         try {
             data = await this._setPagination(
@@ -254,8 +258,6 @@ export default class RestController {
         req = this._attachDb(req);
         this.destroy(req, res, next);
     }
-
-
 
     /**
      * Converts controller methods to

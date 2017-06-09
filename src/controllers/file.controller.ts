@@ -11,6 +11,7 @@ export default class FileController extends AuthController {
     protected upload: any;
     protected allowedMimeTypes: string[] = [];
     protected maxSize: number = -1;
+    protected denyUploadOn: string[] = [];
 
     constructor(prefix = '', options: { root?: string, fieldname?: string, maxSize?: number } = {}) {
         super(prefix, options);
@@ -79,15 +80,90 @@ export default class FileController extends AuthController {
         let items = await ls(this.root);
 
         if (!items.includes(req.params.id)) {
-            return next(new NotFoundError(`Cannot find resource ${req.params.id}`));
+            return next(new NotFoundError(`Cannot find resource ${req.params[this.pk]}`));
         }
 
         try {
-            await rm(`${this.root}/${req.params.id}`);
+            await rm(`${this.root}/${req.params[this.pk]}`);
         } catch (e) {
             return next(e);
         }
 
         res.sendStatus(204);
+    }
+
+    async createWrapper(req, res, next) {
+        try {
+            await this.clearFileIfDisabled('create', req);
+        } catch(e) {
+            return next(e);
+        }
+
+        super.createWrapper(req, res, next);
+    }
+
+    async listWrapper(req, res, next) {
+        try {
+            await this.clearFileIfDisabled('list', req);
+        } catch(e) {
+            return next(e);
+        }
+
+        super.listWrapper(req, res, next);
+    }
+
+    async retrieveWrapper(req, res, next) {
+        try {
+            await this.clearFileIfDisabled('list', req);
+        } catch(e) {
+            return next(e);
+        }
+
+        super.listWrapper(req, res, next);
+    }
+
+    async updateWrapper(req, res, next) {
+        try {
+            await this.clearFileIfDisabled('update', req);
+        } catch(e) {
+            return next(e);
+        }
+
+        super.updateWrapper(req, res, next);
+    }
+
+    /**
+     * If `destroy` is disabled or denyUploadOn contains `destroy`,
+     * we'll remove the buffered file and clear out req.file
+     *
+     * */
+    async destroyWrapper(req, res, next) {
+        try {
+            await this.clearFileIfDisabled('destroy', req);
+        } catch(e) {
+            return next(e);
+        }
+
+        super.destroyWrapper(req, res, next);
+    }
+
+    /**
+     * Will remove the buffered file and `req.file`,
+     * if `method` is disabled or denyed uploading
+     * */
+    protected async clearFileIfDisabled(method, req) {
+        if (!req.file) { return; }
+
+        if (this.disable.includes(method) ||
+            this.denyUploadOn.includes(method)) {
+            try {
+                await rm(`${req.file.path}`);
+            } catch(e) {
+                throw e;
+            }
+
+            req.file = null; // Clear out file
+        }
+
     }
 }

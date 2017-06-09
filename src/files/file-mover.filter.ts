@@ -12,11 +12,14 @@ export default class FileMoverFilter extends Filter {
 
     async canAccess(req, res): Promise<any> {
         const {file} = req;
+        if (!file) { return; } // No need to validate a file which is non existent
 
-        if (!file) { return; }
-
-        await this.abortIfExists(file); // Expects to throw an HttpError
-        await mv(`${file.path}`, `${file.destination}/${file.originalname}`);
+        try {
+            await this.abortIfExists(file); // Expects to throw an HttpError
+            await mv(`${file.path}`, `${file.destination}/${file.originalname}`);
+        } catch (e) {
+            throw e;
+        }
 
         req.file.filename = req.file.originalname;
         req.file.path = `${req.file.destination}/${req.file.originalname}`;
