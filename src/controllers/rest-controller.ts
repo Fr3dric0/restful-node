@@ -88,12 +88,12 @@ export default class RestController {
      * @param       res
      * @param       next
      * */
-    list(req, res, next) {
+    async list(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
 
-        let query = this._setPagination(this.model.find(req.body), req);
+        let query = await this.model.find(req.body);
 
         query
             .then((data) => {
@@ -110,7 +110,7 @@ export default class RestController {
      * @param res
      * @param next
      * */
-    retrieve(req, res, next) {
+    async retrieve(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
@@ -132,7 +132,7 @@ export default class RestController {
      * @param res
      * @param next
      * */
-    update(req, res, next) {
+    async update(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
@@ -161,7 +161,7 @@ export default class RestController {
      * @param res
      * @param next
      * */
-    create(req, res, next) {
+    async create(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
@@ -179,7 +179,7 @@ export default class RestController {
      * @param res
      * @param next
      * */
-    destroy(req, res, next) {
+    async destroy(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
         }
@@ -201,7 +201,7 @@ export default class RestController {
         }
 
         req = this._attachDb(req);
-        this.list(req, res, next);
+        await this.list(req, res, next);
     }
 
     async retrieveWrapper(req, res, next) {
@@ -220,20 +220,19 @@ export default class RestController {
         // Skip loading of content
         // if no content exists
         if (!req.params[this.pk] || !this.model) {
-            return this.retrieve(req, res, next);
+            return await this.retrieve(req, res, next);
         }
 
         let data;
         try {
-            data = await this._setPagination(
-                this.model.findOne(this.getPkQuery(req)), req);
+            data = await this.model.findOne(this.getPkQuery(req));
         } catch (e) {
             return next(e);
         }
 
         req.db.data[req.db.name] = data;
 
-        this.retrieve(req, res, next);
+        await this.retrieve(req, res, next);
     }
 
     async createWrapper(req, res, next) {
@@ -248,7 +247,7 @@ export default class RestController {
         }
 
         req = this._attachDb(req);
-        this.create(req, res, next);
+        await this.create(req, res, next);
     }
 
     async updateWrapper(req, res, next) {
@@ -265,7 +264,7 @@ export default class RestController {
         req = this._attachDb(req);
 
         if (!req.params[this.pk] || !this.model) {
-            return this.update(req, res, next);
+            return await this.update(req, res, next);
         }
 
         let data;
@@ -280,7 +279,7 @@ export default class RestController {
         }
 
         req.db.data[req.db.name] = data;
-        this.update(req, res, next)
+        await this.update(req, res, next)
     }
 
     async destroyWrapper(req, res, next) {
@@ -295,7 +294,7 @@ export default class RestController {
         }
 
         req = this._attachDb(req);
-        this.destroy(req, res, next);
+        await this.destroy(req, res, next);
     }
 
     /**
