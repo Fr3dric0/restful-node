@@ -3,8 +3,16 @@ import { NotFoundError, MethodNotAllowed } from '../errors/http.error';
 import Filter from '../auth/filter';
 
 /**
+ * RestController is the root-controller for _restful-node_.
+ * It provides a simple way to built a CRUD server, in a
+ * "MVC-like" structure. Everything builds
+ * on classes and inheritance, to provide the expected functionality.
+ *
+ * A simple child of RestController, should only have to provide a `model`,
+ * for it to support all the basic CRUD operations.
  *
  * @module  controller/response
+ * @typedef RestController
  * */
 export default class RestController {
     protected model: any = null;
@@ -13,13 +21,39 @@ export default class RestController {
     protected fields: string[] = []; // Database fields (not implemented)
     protected middleware: Function[] = [];
     protected disable: string[] = [];
-    protected ignorePkOn: string[] = []; // Gives the option to ignore `id` on urls
+
+    /**
+     * Option to ignore Primary Key (pk), on specific methods.
+     * Will not work on `retrieve`, as `list` already exists
+     * @type string[]
+     * */
+    protected ignorePkOn: string[] = [];
+
+    /**
+     * Primary Key (pk) is the url identifier added
+     * to the requests:
+     *  - `retrieve` (GET /:<pk>)
+     *  - `update` (PATCH /:<pk>)
+     *  - `destroy (DELETE /:<pk>)
+     *
+     * The default value is `id`, synonymous with
+     * mongoose's `_id` field. And will be
+     * treated as an ObjectId. Every other fields
+     * will be treated as a string or number
+     * @type string
+     * */
     protected pk: string = 'id'; // Primary key (pk), used when handling single items
 
-    // Filters used to
-    // handle validation etc.
-    // before the request-methods (list, retrieve, ...)
-    // is called
+
+    /**
+     * Filters are used to handle validation
+     * of requests before `list`, `retrieve`, `create`, etc.
+     * is called.
+     *
+     * Built to run on every request for the controller (might be changed in the future).
+     * Useful when validating a form, header values, file properties, etc.
+     * @type Filter[]
+     * */
     protected filters: Filter[] = [];
 
     constructor(prefix = '', options: { pk?: string } = {}) {
@@ -101,6 +135,11 @@ export default class RestController {
     update(req, res, next) {
         if (!this.model) {
             return res.sendStatus(405);
+        }
+
+        if (req.body.includes('_id') || req.body.includes('__v')) {
+            delete req.body._id;
+            delete req.body.__v;
         }
 
         this.model.findOneAndUpdate(

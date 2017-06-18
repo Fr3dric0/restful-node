@@ -149,7 +149,7 @@ export default class FileController extends AuthController {
 
     /**
      * Will remove the buffered file and `req.file`,
-     * if `method` is disabled or denyed uploading
+     * if `method` is disabled or denied uploading
      * */
     protected async clearFileIfDisabled(method, req) {
         if (!req.file) { return; }

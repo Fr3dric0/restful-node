@@ -9,10 +9,6 @@ class BasicController extends RestController {
     }
     
     
-    async update(req, res, next) {
-        res.send(req.settings);
-    }
-    
 }
 
 module.exports = BasicController;
