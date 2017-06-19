@@ -21,7 +21,7 @@ HelloWorld.post('save', (err, doc, next) => {
     return next(new BadRequestError(err.errors.description.message))
   }
   
-  next();
+  next(err);
 });
 
 module.exports = mongoose.model('HelloWorld', HelloWorld);
