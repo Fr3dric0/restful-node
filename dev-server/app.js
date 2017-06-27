@@ -3,6 +3,7 @@ const path = require('path');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const restful = require('../dist');
 
@@ -33,7 +34,7 @@ app.use(cookieParser());
 // Provide configuration //
 // as parameter          //
 ///////////////////////////
-restful.database.setupMongoose({ database: 'hello-world' })
+restful.database.setupMongoose(mongoose, { database: 'hello-world' })
     .then((db) => {
         console.log('Database connection established');
     })

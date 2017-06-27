@@ -245,8 +245,8 @@ export default class RestController {
         } catch (e) {
             return next(e);
         }
-
         req = this._attachDb(req);
+
         return this.create(req, res, next);
     }
 
@@ -332,7 +332,6 @@ export default class RestController {
             this.destroyWrapper
         );
 
-        // router.stack.forEach((s) => console.log(s.route.stack));
         return router;
     }
 

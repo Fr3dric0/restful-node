@@ -21,7 +21,7 @@ export default class AuthController extends RestController {
             return next(e);
         }
 
-        super.listWrapper(req, res, next);
+        return super.listWrapper(req, res, next);
     }
 
     async retrieveWrapper(req, res, next) {
@@ -35,7 +35,7 @@ export default class AuthController extends RestController {
             return next(e);
         }
 
-        super.retrieveWrapper(req, res, next);
+        return super.retrieveWrapper(req, res, next);
     }
 
     async createWrapper(req, res, next) {
@@ -49,7 +49,7 @@ export default class AuthController extends RestController {
             return next(e);
         }
 
-        super.createWrapper(req, res, next)
+        return super.createWrapper(req, res, next)
     }
 
     async updateWrapper(req, res, next) {
@@ -63,7 +63,7 @@ export default class AuthController extends RestController {
             return next(e);
         }
 
-        super.updateWrapper(req, res, next);
+        return super.updateWrapper(req, res, next);
     }
 
     async destroyWrapper(req, res, next) {
@@ -77,7 +77,7 @@ export default class AuthController extends RestController {
             return next(e);
         }
 
-        super.destroyWrapper(req, res, next);
+        return super.destroyWrapper(req, res, next);
     }
 
     private runAuthFilter(req, res): Promise<any> {
